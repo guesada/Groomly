@@ -419,7 +419,11 @@ function renderTopServices(completedAppointments) {
 let agendaState = {
     currentDate: new Date(),
     currentFilter: 'todos',
-    appointments: []
+    appointments: [],
+    viewMode: 'expanded', // 'expanded' ou 'compact'
+    searchQuery: '',
+    soundEnabled: true,
+    lastAppointmentCount: 0
 };
 
 async function initAgendaInteligente() {
@@ -443,22 +447,24 @@ async function initAgendaInteligente() {
 
 function updateDateDisplay() {
     const dateFullText = document.getElementById('date-full-text');
+    const dateDayName = document.getElementById('date-day-name');
     if (!dateFullText) return;
     
     const today = new Date().toISOString().split('T')[0];
     const currentDateStr = agendaState.currentDate.toISOString().split('T')[0];
     
-    const dateDisplay = document.querySelector('.date-day');
-    if (dateDisplay) {
-        dateDisplay.textContent = currentDateStr === today ? 'Hoje' : 'Data Selecionada';
-    }
-    
+    // Data principal
     dateFullText.textContent = agendaState.currentDate.toLocaleDateString('pt-BR', {
-        weekday: 'long',
         day: '2-digit',
         month: 'long',
         year: 'numeric'
     });
+    
+    // Dia da semana
+    if (dateDayName) {
+        const dayName = agendaState.currentDate.toLocaleDateString('pt-BR', { weekday: 'long' });
+        dateDayName.textContent = currentDateStr === today ? 'Hoje' : dayName.charAt(0).toUpperCase() + dayName.slice(1);
+    }
 }
 
 function renderAgendaDigital() {
@@ -489,6 +495,37 @@ function renderAgendaDigital() {
     }
     
     // Atualizar stats
+    updateAgendaStats();
+    
+    // Renderizar lista
+    if (filtered.length === 0) {
+        container.innerHTML = `
+            <div class="timeline-empty">
+                <div class="timeline-empty-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="timeline-empty-title">Nenhum agendamento encontrado</div>
+                <div class="timeline-empty-text">
+                    ${agendaState.currentFilter === 'todos' 
+                        ? 'Nenhum agendamento para este dia' 
+                        : `Nenhum agendamento ${agendaState.currentFilter} para este dia`
+                    }
+                </div>
+            </div>
+        `;
+        return;
+    }
+    
+    // Ordenar por horário
+    filtered.sort((a, b) => a.horario.localeCompare(b.horario));
+    
+    // Renderizar cards
+    container.innerHTML = filtered.map(apt => renderAppointmentCardModern(apt)).join('');
+}
+
+function updateAgendaStats() {
+    const today = new Date().toISOString().split('T')[0];
+    
     const todayCount = agendaState.appointments.filter(a => {
         const aptDate = a.data;
         return aptDate === today && ['agendado', 'confirmado', 'pendente'].includes(a.status);
@@ -509,26 +546,11 @@ function renderAgendaDigital() {
     if (elHoje) elHoje.textContent = todayCount;
     if (elConfirmados) elConfirmados.textContent = confirmedCount;
     if (elPendentes) elPendentes.textContent = pendingCount;
-    
-    // Renderizar lista
-    if (filtered.length === 0) {
-        container.innerHTML = `
-            <div class="timeline-empty">
-                <div class="timeline-empty-icon">
-                    <i class="fas fa-calendar-check"></i>
-                </div>
-                <div class="timeline-empty-title">Nenhum agendamento neste dia</div>
-                <div class="timeline-empty-text">Aproveite para relaxar ou organizar seu espaço!</div>
-            </div>
-        `;
-        return;
-    }
-    
-    // Ordenar por horário
-    filtered.sort((a, b) => a.horario.localeCompare(b.horario));
-    
-    // Renderizar cards
-    container.innerHTML = filtered.map(apt => renderAppointmentCardModern(apt)).join('');
+}
+
+function refreshAgenda() {
+    console.log('🔄 Atualizando agenda...');
+    initAgendaInteligente();
 }
 
 function renderAppointmentCardModern(apt) {
@@ -548,7 +570,8 @@ function renderAppointmentCardModern(apt) {
             ${canComplete ? `
                 <div class="appointment-checkbox">
                     <label class="checkbox-wrapper">
-                        <input type="checkbox" class="checkbox-input" 
+                        <input type="checkbox" 
+                               class="checkbox-input"
                                onchange="handleCheckboxChange('${aptId}', this.checked)"
                                ${isCompleted ? 'checked' : ''}>
                         <span class="checkbox-custom">
@@ -693,7 +716,6 @@ function startAutoRefresh() {
 window.initBarbeiroDashboard = initBarbeiroDashboard;
 window.loadProfessionalMetrics = loadProfessionalMetrics;
 window.loadHeroUpcomingAppointments = loadHeroUpcomingAppointments;
-
 window.loadWeeklyChartData = loadWeeklyChartData;
 window.loadTopServicesData = loadTopServicesData;
 window.initAgendaInteligente = initAgendaInteligente;
@@ -703,6 +725,8 @@ window.setQuickFilter = setQuickFilter;
 window.previousDay = previousDay;
 window.nextDay = nextDay;
 window.goToToday = goToToday;
+window.refreshAgenda = refreshAgenda;
+window.updateAgendaStats = updateAgendaStats;
 
 // Verificar dependências
 console.log('🔍 Verificando dependências...');

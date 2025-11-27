@@ -144,71 +144,79 @@
                     </div>
                 </div>
 
-                <!-- Agenda Digital Visual -->
+                <!-- Agenda Inteligente Ultra Moderna -->
                 <div id="agenda-inteligente" class="content-section">
                     <div class="agenda-digital-container">
-                        <!-- Header da Agenda -->
+                        
+                        <!-- Header Limpo -->
                         <div class="agenda-digital-header">
                             <div class="agenda-digital-title">
                                 <i class="fas fa-calendar-alt"></i>
-                                <h2>Agenda Digital</h2>
+                                <h2>Agenda Inteligente</h2>
                             </div>
+                            
+                            <!-- Stats Minimalistas -->
                             <div class="agenda-digital-stats">
                                 <div class="stat-badge stat-today">
                                     <i class="fas fa-calendar-day"></i>
                                     <span id="agenda-stat-hoje">0</span>
-                                    <span class="stat-label">Hoje</span>
+                                    <div class="stat-label">Hoje</div>
                                 </div>
                                 <div class="stat-badge stat-confirmed">
                                     <i class="fas fa-check-circle"></i>
                                     <span id="agenda-stat-confirmados">0</span>
-                                    <span class="stat-label">Confirmados</span>
+                                    <div class="stat-label">Confirmados</div>
                                 </div>
                                 <div class="stat-badge stat-pending">
                                     <i class="fas fa-clock"></i>
                                     <span id="agenda-stat-pendentes">0</span>
-                                    <span class="stat-label">Pendentes</span>
+                                    <div class="stat-label">Pendentes</div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Controles da Agenda -->
+                        <!-- Controles Limpos -->
                         <div class="agenda-digital-controls">
+                            <!-- Navegação de Data -->
                             <div class="agenda-date-nav">
-                                <button class="date-nav-btn" onclick="previousDay()" title="Dia Anterior">
+                                <button class="date-nav-btn" onclick="previousDay()">
                                     <i class="fas fa-chevron-left"></i>
                                 </button>
-                                <div class="current-date-display" id="current-date-display">
-                                    <div class="date-day">Hoje</div>
+                                <div class="current-date-display">
+                                    <div class="date-day" id="date-day-name">Hoje</div>
                                     <div class="date-full" id="date-full-text">Carregando...</div>
                                 </div>
-                                <button class="date-nav-btn" onclick="nextDay()" title="Próximo Dia">
+                                <button class="date-nav-btn" onclick="nextDay()">
                                     <i class="fas fa-chevron-right"></i>
                                 </button>
-                                <button class="date-nav-btn today-btn" onclick="goToToday()" title="Ir para Hoje">
+                                <button class="date-nav-btn today-btn" onclick="goToToday()">
                                     <i class="fas fa-calendar-day"></i>
                                     Hoje
                                 </button>
                             </div>
 
+                            <!-- Filtros Simples -->
                             <div class="agenda-quick-filters">
                                 <button class="quick-filter-btn active" onclick="setQuickFilter('todos')" data-filter="todos">
-                                    <i class="fas fa-list"></i> Todos
+                                    Todos
                                 </button>
                                 <button class="quick-filter-btn" onclick="setQuickFilter('pendente')" data-filter="pendente">
-                                    <i class="fas fa-clock"></i> Pendentes
+                                    Pendentes
                                 </button>
                                 <button class="quick-filter-btn" onclick="setQuickFilter('confirmado')" data-filter="confirmado">
-                                    <i class="fas fa-check"></i> Confirmados
+                                    Confirmados
+                                </button>
+                                <button class="quick-filter-btn" onclick="setQuickFilter('concluido')" data-filter="concluido">
+                                    Concluídos
                                 </button>
                             </div>
                         </div>
 
-                        <!-- Lista de Agendamentos -->
+                        <!-- Timeline Limpa -->
                         <div class="agenda-digital-timeline" id="agenda-digital-timeline">
                             <div class="timeline-loading">
                                 <i class="fas fa-spinner fa-spin"></i>
-                                <span>Carregando agendamentos...</span>
+                                Carregando agendamentos...
                             </div>
                         </div>
                     </div>
