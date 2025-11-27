@@ -1,5 +1,49 @@
 /* ===== AGENDAMENTOS TAB - DESIGN SOFISTICADO ===== */
 
+/* Page Header */
+.agendamentos-page-header {
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.agendamentos-page-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 8px;
+}
+
+.agendamentos-page-title i {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(37, 99, 235, 0.08) 100%);
+  color: var(--color-primary);
+  border-radius: 14px;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.agendamentos-page-title h2 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.agendamentos-page-subtitle {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin: 0;
+  padding-left: 62px;
+  letter-spacing: 0.2px;
+}
+
 /* Tabs Container */
 .tabs-container {
   background: transparent;

@@ -13,12 +13,12 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/proximos-agendamentos.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/header-navbar.css') }}">
     <!-- Cliente CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/dashboard-nova.css') }}?v=11">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/agendamentos-tab.css') }}?v=11">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/cancel-modal.css') }}?v=11">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/novo-agendamento.css') }}?v=11">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/booking-form.css') }}?v=11">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/calendar-picker.css') }}?v=11">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/dashboard-nova.css') }}?v=12">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/agendamentos-tab.css') }}?v=12">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/cancel-modal.css') }}?v=12">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/novo-agendamento.css') }}?v=12">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/booking-form.css') }}?v=12">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/calendar-picker.css') }}?v=12">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body class="dark-theme">
@@ -267,11 +267,12 @@
                 
                 <!-- Agendamentos com Abas -->
                 <div id="agendamentos-cliente" class="content-section">
-                    <div class="section-header" style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
-                        <div class="custom-icon icon-gradient-blue" style="width: 40px; height: 40px; font-size: 20px;">
-                            <i class="fas fa-calendar"></i>
+                    <div class="agendamentos-page-header">
+                        <div class="agendamentos-page-title">
+                            <i class="fas fa-calendar-alt"></i>
+                            <h2>Agendamentos</h2>
                         </div>
-                        <h2 style="margin: 0;">Agendamentos</h2>
+                        <p class="agendamentos-page-subtitle">Gerencie seus agendamentos e agende novos cortes</p>
                     </div>
 
                     <!-- Abas -->
