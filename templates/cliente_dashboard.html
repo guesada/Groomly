@@ -16,7 +16,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/header-modern.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/hero-modern.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/dashboard-nova.css') }}?v=12">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/theme-verde.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/agendamentos-tab.css') }}?v=12">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/historico.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/cancel-modal.css') }}?v=12">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/novo-agendamento.css') }}?v=12">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/booking-form.css') }}?v=12">
@@ -413,13 +415,29 @@
 
                 <!-- Histórico Cliente -->
                 <div id="historico-cliente" class="content-section">
-                    <div class="section-header" style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
-                        <div class="custom-icon icon-gradient-purple" style="width: 40px; height: 40px; font-size: 20px;">
-                            <i class="fas fa-history"></i>
+                    <div class="historico-header">
+                        <div class="historico-header-content">
+                            <div class="historico-icon">
+                                <i class="fas fa-history"></i>
+                            </div>
+                            <div>
+                                <h2>Histórico de Serviços</h2>
+                                <p>Todos os seus atendimentos realizados</p>
+                            </div>
                         </div>
-                        <h2 style="margin: 0;">Histórico de Serviços</h2>
+                        <div class="historico-stats">
+                            <div class="historico-stat-item">
+                                <span class="historico-stat-value" id="historico-total">0</span>
+                                <span class="historico-stat-label">Total</span>
+                            </div>
+                            <div class="historico-stat-item">
+                                <span class="historico-stat-value">R$ <span id="historico-gasto">0,00</span></span>
+                                <span class="historico-stat-label">Investido</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="historico-list" id="historico-lista">
+                    
+                    <div class="historico-timeline" id="historico-lista">
                         <!-- Histórico será carregado via JS -->
                     </div>
                 </div>
