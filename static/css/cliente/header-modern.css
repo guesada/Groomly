@@ -98,8 +98,8 @@
 }
 
 .nav-item.active {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
-  color: #10b981;
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.1), rgba(4, 120, 87, 0.1));
+  color: #059669;
 }
 
 .nav-item.active::after {
@@ -109,7 +109,7 @@
   left: 20px;
   right: 20px;
   height: 3px;
-  background: linear-gradient(90deg, #10b981, #059669);
+  background: linear-gradient(90deg, #059669, #047857);
   border-radius: 3px 3px 0 0;
 }
 
@@ -294,7 +294,7 @@
   }
   
   .nav-item.active i {
-    color: #10b981;
+    color: #059669;
   }
   
   .brand-logo {
