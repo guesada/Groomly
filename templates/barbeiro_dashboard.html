@@ -42,6 +42,10 @@
                         <i class="fas fa-calendar-alt"></i>
                         <span>Agenda</span>
                     </button>
+                    <button class="nav-item" onclick="showSection('precos-barbeiro')" data-section="precos-barbeiro">
+                        <i class="fas fa-dollar-sign"></i>
+                        <span>Preços</span>
+                    </button>
                     <button class="nav-item" onclick="showSection('estoque-barbeiro')" data-section="estoque-barbeiro">
                         <i class="fas fa-box"></i>
                         <span>Estoque</span>
@@ -207,6 +211,96 @@
                                 <span>Carregando agendamentos...</span>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Preços -->
+                <div id="precos-barbeiro" class="content-section">
+                    <div class="section-header" style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
+                        <div class="custom-icon icon-gradient-green" style="width: 40px; height: 40px; font-size: 20px; color: white;">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <h2 style="margin: 0;">Meus Preços</h2>
+                    </div>
+
+                    <div class="elegant-card" style="margin-bottom: 24px; padding: 32px;">
+                        <h3 style="font-size: 18px; font-weight: 600; color: var(--color-text); margin-bottom: 8px;">Configure seus preços</h3>
+                        <p style="font-size: 14px; color: var(--color-text-secondary); margin-bottom: 24px;">
+                            Defina o valor que você cobra por cada serviço. Estes preços serão exibidos para os clientes.
+                        </p>
+                        
+                        <form id="prices-form" onsubmit="handlePricesSubmit(event)">
+                            <div class="form-row" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="fas fa-cut"></i> Corte
+                                    </label>
+                                    <div style="position: relative;">
+                                        <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--color-text-secondary);">R$</span>
+                                        <input id="price-corte" type="number" step="0.01" min="0" class="form-control" placeholder="35.00" required style="padding-left: 40px;">
+                                    </div>
+                                    <small style="color: var(--color-text-secondary); font-size: 12px; margin-top: 4px; display: block;">
+                                        Corte de cabelo masculino
+                                    </small>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="fas fa-cut"></i> + <i class="fas fa-user-tie"></i> Corte + Barba
+                                    </label>
+                                    <div style="position: relative;">
+                                        <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--color-text-secondary);">R$</span>
+                                        <input id="price-corte-barba" type="number" step="0.01" min="0" class="form-control" placeholder="55.00" required style="padding-left: 40px;">
+                                    </div>
+                                    <small style="color: var(--color-text-secondary); font-size: 12px; margin-top: 4px; display: block;">
+                                        Corte + barba completa
+                                    </small>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="fas fa-user-tie"></i> Barba
+                                    </label>
+                                    <div style="position: relative;">
+                                        <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--color-text-secondary);">R$</span>
+                                        <input id="price-barba" type="number" step="0.01" min="0" class="form-control" placeholder="25.00" required style="padding-left: 40px;">
+                                    </div>
+                                    <small style="color: var(--color-text-secondary); font-size: 12px; margin-top: 4px; display: block;">
+                                        Aparar e modelar barba
+                                    </small>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--color-border);">
+                                <button type="submit" class="btn btn--primary btn-modern">
+                                    <i class="fas fa-save"></i> Salvar Preços
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="elegant-card" style="padding: 24px;">
+                        <h3 style="font-size: 16px; font-weight: 600; color: var(--color-text); margin-bottom: 16px;">
+                            <i class="fas fa-info-circle"></i> Dicas de Precificação
+                        </h3>
+                        <ul style="list-style: none; padding: 0; margin: 0;">
+                            <li style="padding: 12px 0; border-bottom: 1px solid var(--color-border);">
+                                <i class="fas fa-check" style="color: #10b981; margin-right: 8px;"></i>
+                                Pesquise os preços da concorrência na sua região
+                            </li>
+                            <li style="padding: 12px 0; border-bottom: 1px solid var(--color-border);">
+                                <i class="fas fa-check" style="color: #10b981; margin-right: 8px;"></i>
+                                Considere sua experiência e qualificações
+                            </li>
+                            <li style="padding: 12px 0; border-bottom: 1px solid var(--color-border);">
+                                <i class="fas fa-check" style="color: #10b981; margin-right: 8px;"></i>
+                                Ofereça desconto no combo (Corte + Barba)
+                            </li>
+                            <li style="padding: 12px 0;">
+                                <i class="fas fa-check" style="color: #10b981; margin-right: 8px;"></i>
+                                Você pode ajustar seus preços a qualquer momento
+                            </li>
+                        </ul>
                     </div>
                 </div>
 
@@ -380,10 +474,59 @@
             }
         }
         
+        async function loadBarberPrices() {
+            try {
+                const response = await fetch('/api/barber-prices');
+                const result = await response.json();
+                
+                if (result.success) {
+                    const prices = result.data || {};
+                    document.getElementById('price-corte').value = prices['Corte'] || 35.00;
+                    document.getElementById('price-corte-barba').value = prices['Corte + Barba'] || 55.00;
+                    document.getElementById('price-barba').value = prices['Barba'] || 25.00;
+                }
+            } catch (error) {
+                console.error('Erro ao carregar preços:', error);
+            }
+        }
+        
+        async function handlePricesSubmit(e) {
+            e.preventDefault();
+            
+            const prices = {
+                'Corte': parseFloat(document.getElementById('price-corte').value),
+                'Corte + Barba': parseFloat(document.getElementById('price-corte-barba').value),
+                'Barba': parseFloat(document.getElementById('price-barba').value)
+            };
+            
+            try {
+                const response = await fetch('/api/barber-prices', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(prices)
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    if (typeof showNotificationToast === 'function') {
+                        showNotificationToast('Preços atualizados com sucesso!', 'success');
+                    } else {
+                        alert('Preços atualizados com sucesso!');
+                    }
+                } else {
+                    alert('Erro ao atualizar preços: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao atualizar preços');
+            }
+        }
+        
         document.addEventListener('DOMContentLoaded', () => {
             const firstBtn = document.querySelector('.nav-item');
             if (firstBtn) firstBtn.classList.add('active');
             loadProducts();
+            loadBarberPrices();
         });
     </script>
 </body>
