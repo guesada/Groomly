@@ -854,3 +854,216 @@
 .hero-stat-item:nth-child(3) {
   animation-delay: 0.3s;
 }
+
+/* ===== PRÓXIMOS AGENDAMENTOS NA HERO ===== */
+
+.hero-upcoming-appointments {
+  margin-top: 32px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 24px;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-upcoming-header {
+  margin-bottom: 20px;
+}
+
+.hero-upcoming-header h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+
+.hero-upcoming-header h3 i {
+  color: #60a5fa;
+}
+
+.hero-upcoming-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hero-upcoming-loading {
+  text-align: center;
+  padding: 20px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+}
+
+.hero-upcoming-loading i {
+  font-size: 20px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.hero-upcoming-item {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.3s ease;
+}
+
+.hero-upcoming-item:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateX(4px);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.hero-upcoming-time {
+  min-width: 100px;
+  text-align: center;
+  padding: 12px;
+  background: rgba(59, 130, 246, 0.2);
+  border-radius: 10px;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.hero-upcoming-time-hour {
+  font-size: 20px;
+  font-weight: 700;
+  color: #60a5fa;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.hero-upcoming-time-date {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+}
+
+.hero-upcoming-info {
+  flex: 1;
+}
+
+.hero-upcoming-service {
+  font-size: 15px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 6px;
+}
+
+.hero-upcoming-client {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hero-upcoming-client i {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.hero-upcoming-status {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.hero-upcoming-status.agendado {
+  background: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.hero-upcoming-status.confirmado {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.hero-upcoming-status.pendente {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.hero-upcoming-empty {
+  text-align: center;
+  padding: 32px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.hero-upcoming-empty i {
+  font-size: 40px;
+  margin-bottom: 12px;
+  display: block;
+  opacity: 0.5;
+}
+
+.hero-upcoming-empty-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.hero-upcoming-empty-text {
+  font-size: 14px;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .hero-upcoming-item {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .hero-upcoming-time {
+    width: 100%;
+  }
+  
+  .hero-upcoming-info {
+    width: 100%;
+  }
+  
+  .hero-upcoming-client {
+    justify-content: center;
+  }
+}
+
+/* Animação */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-upcoming-item {
+  animation: slideInUp 0.4s ease-out;
+}
+
+.hero-upcoming-item:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.hero-upcoming-item:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.hero-upcoming-item:nth-child(3) {
+  animation-delay: 0.3s;
+}
