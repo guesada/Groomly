@@ -3,6 +3,14 @@
 async function loadClienteDashboard() {
     console.log('📊 Carregando dashboard do cliente...');
     
+    // Verificar se os elementos existem
+    console.log('🔍 Verificando elementos:', {
+        heroStatAtivos: !!document.getElementById('hero-stat-ativos'),
+        heroStatConcluidos: !!document.getElementById('hero-stat-concluidos'),
+        heroStatProximo: !!document.getElementById('hero-stat-proximo'),
+        proximosLista: !!document.getElementById('proximos-agendamentos-lista')
+    });
+    
     try {
         const response = await fetch('/api/appointments');
         const result = await response.json();
@@ -38,17 +46,43 @@ async function loadClienteDashboard() {
                 return (a.horario || a.time).localeCompare(b.horario || b.time);
             });
         
-        // Atualizar stats
-        document.getElementById('stat-total').textContent = ativos;
-        document.getElementById('stat-concluidos').textContent = concluidos;
+        // Atualizar stats do hero
+        const statAtivos = document.getElementById('hero-stat-ativos');
+        const statConcluidos = document.getElementById('hero-stat-concluidos');
+        const statProximo = document.getElementById('hero-stat-proximo');
+        
+        if (statAtivos) statAtivos.textContent = ativos;
+        if (statConcluidos) statConcluidos.textContent = concluidos;
         
         if (proximos.length > 0) {
             const proximo = proximos[0];
             const date = new Date((proximo.data || proximo.date) + 'T00:00:00');
             const dias = Math.ceil((date - new Date()) / (1000 * 60 * 60 * 24));
-            document.getElementById('stat-proximo').textContent = dias === 0 ? 'Hoje' : `${dias}d`;
+            if (statProximo) {
+                statProximo.textContent = dias === 0 ? 'Hoje' : dias === 1 ? 'Amanhã' : `${dias}d`;
+            }
         } else {
-            document.getElementById('stat-proximo').textContent = '--';
+            if (statProximo) statProximo.textContent = '--';
+        }
+        
+        // Atualizar stats antigos (se existirem - compatibilidade)
+        const oldStatTotal = document.getElementById('stat-total');
+        const oldStatConcluidos = document.getElementById('stat-concluidos');
+        const oldStatProximo = document.getElementById('stat-proximo');
+        const oldStatAtivos = document.getElementById('stat-ativos');
+        
+        if (oldStatTotal) oldStatTotal.textContent = ativos;
+        if (oldStatConcluidos) oldStatConcluidos.textContent = concluidos;
+        if (oldStatAtivos) oldStatAtivos.textContent = ativos;
+        if (oldStatProximo) {
+            if (proximos.length > 0) {
+                const proximo = proximos[0];
+                const date = new Date((proximo.data || proximo.date) + 'T00:00:00');
+                const dias = Math.ceil((date - new Date()) / (1000 * 60 * 60 * 24));
+                oldStatProximo.textContent = dias === 0 ? 'Hoje' : `${dias}d`;
+            } else {
+                oldStatProximo.textContent = '--';
+            }
         }
         
         // Renderizar próximos agendamentos
@@ -61,6 +95,11 @@ async function loadClienteDashboard() {
 
 function renderProximosAgendamentos(appointments) {
     const container = document.getElementById('proximos-agendamentos-lista');
+    
+    if (!container) {
+        console.warn('⚠️ Container proximos-agendamentos-lista não encontrado');
+        return;
+    }
     
     if (appointments.length === 0) {
         container.innerHTML = `
