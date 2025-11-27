@@ -90,7 +90,7 @@
                             <div class="barber-hero-stats">
                                 <div class="hero-stat-item">
                                     <div class="hero-stat-icon">
-                                        <i class="fas fa-calendar-check"></i>
+                                        <i class="fas fa-calendar-day"></i>
                                     </div>
                                     <div class="hero-stat-content">
                                         <div class="hero-stat-value" id="hero-stat-hoje">0</div>
@@ -99,11 +99,11 @@
                                 </div>
                                 <div class="hero-stat-item">
                                     <div class="hero-stat-icon">
-                                        <i class="fas fa-clock"></i>
+                                        <i class="fas fa-calendar-check"></i>
                                     </div>
                                     <div class="hero-stat-content">
-                                        <div class="hero-stat-value" id="hero-stat-pendentes">0</div>
-                                        <div class="hero-stat-label">Pendentes</div>
+                                        <div class="hero-stat-value" id="hero-stat-proximos">0</div>
+                                        <div class="hero-stat-label">Próximos</div>
                                     </div>
                                 </div>
                                 <div class="hero-stat-item">
@@ -117,202 +117,94 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="barber-hero-actions">
-                            <button class="hero-action-btn primary" onclick="showSection('agenda-inteligente')">
-                                <i class="fas fa-calendar-alt"></i>
-                                <span>Ver Agenda Completa</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div style="margin-bottom: 1.5rem;">
-                        <h2 style="font-size: 1.25rem; font-weight: 700; margin: 0; color: var(--color-text);">
-                            Visão Geral do Negócio
-                        </h2>
-                    </div>
-
-                    <!-- Métricas -->
-                    <div class="professional-metrics">
-                        <div class="metric-card revenue">
-                            <div class="metric-header">
-                                <div class="metric-icon">
-                                    <i class="fas fa-dollar-sign"></i>
+                        
+                        <!-- Próximos Agendamentos na Hero -->
+                        <div class="hero-upcoming-appointments" id="hero-upcoming-appointments">
+                            <div class="hero-upcoming-header">
+                                <h3><i class="fas fa-clock"></i> Próximos Agendamentos</h3>
+                            </div>
+                            <div class="hero-upcoming-list" id="hero-upcoming-list">
+                                <div class="hero-upcoming-loading">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    Carregando...
                                 </div>
-                                <span class="metric-period">Últimos 7 dias</span>
-                            </div>
-                            <div class="metric-value">R$ <span id="revenue-7days">0,00</span></div>
-                            <div class="metric-label">Faturamento</div>
-                            <div class="metric-detail">
-                                Últimos 7 dias
-                            </div>
-                        </div>
-
-                        <div class="metric-card appointments">
-                            <div class="metric-header">
-                                <div class="metric-icon">
-                                    <i class="fas fa-calendar-check"></i>
-                                </div>
-                                <span class="metric-period">Hoje</span>
-                            </div>
-                            <div class="metric-value"><span id="appointments-today">0</span></div>
-                            <div class="metric-label">Agendamentos</div>
-                            <div class="metric-detail">
-                                <span id="completed-today">0</span> concluídos • <span id="pending-today">0</span> pendentes
-                            </div>
-                        </div>
-
-                        <div class="metric-card clients">
-                            <div class="metric-header">
-                                <div class="metric-icon">
-                                    <i class="fas fa-users"></i>
-                                </div>
-                                <span class="metric-period">Este mês</span>
-                            </div>
-                            <div class="metric-value"><span id="clients-month">0</span></div>
-                            <div class="metric-label">Clientes Atendidos</div>
-                            <div class="metric-detail">
-                                <span id="new-clients">0</span> novos clientes
-                            </div>
-                        </div>
-
-                        <div class="metric-card average">
-                            <div class="metric-header">
-                                <div class="metric-icon">
-                                    <i class="fas fa-chart-line"></i>
-                                </div>
-                                <span class="metric-period">Média</span>
-                            </div>
-                            <div class="metric-value">R$ <span id="ticket-average">0,00</span></div>
-                            <div class="metric-label">Ticket Médio</div>
-                            <div class="metric-detail">
-                                Baseado em <span id="total-services">0</span> serviços
                             </div>
                         </div>
                     </div>
-
-                    <!-- Agenda Preview -->
-                    <div class="agenda-highlight">
-                        <div class="agenda-highlight-header">
-                            <div>
-                                <h3 style="font-size: 20px; font-weight: 700; color: white; margin-bottom: 4px;">
-                                    <i class="fas fa-calendar-alt"></i>
-                                    Agenda Inteligente
-                                </h3>
-                                <p style="font-size: 14px; color: rgba(255,255,255,0.9);">Próximos compromissos agendados</p>
-                            </div>
-                            <button onclick="showSection('agenda-inteligente')" class="btn-view-agenda">
-                                Ver Agenda Completa
-                                <i class="fas fa-arrow-right"></i>
-                            </button>
-                        </div>
-                        <div id="agenda-preview" class="agenda-preview">
-                            <div class="loading-agenda">
-                                <i class="fas fa-spinner fa-spin"></i>
-                                Carregando agenda...
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Resumo Semanal -->
-                    <div class="weekly-summary">
-                        <h3 style="font-size: 18px; font-weight: 700; color: var(--color-text); margin-bottom: 20px;">
-                            <i class="fas fa-chart-bar"></i>
-                            Resumo da Semana
-                        </h3>
-                        <div class="weekly-chart">
-                            <div class="chart-bars" id="weekly-chart"></div>
-                        </div>
-                    </div>
-
-                    <!-- Top Serviços -->
-                    <div class="top-services">
-                        <h3 style="font-size: 18px; font-weight: 700; color: var(--color-text); margin-bottom: 20px;">
-                            <i class="fas fa-star"></i>
-                            Serviços Mais Realizados
-                        </h3>
-                        <div id="top-services-list" class="services-ranking">
-                            <div class="loading-services">
-                                <i class="fas fa-spinner fa-spin"></i>
-                                Carregando dados...
-                            </div>
-                        </div>
+                    
+                    <div class="barber-hero-actions">
+                        <button class="hero-action-btn primary" onclick="showSection('agenda-inteligente')">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>Ver Agenda Completa</span>
+                        </button>
                     </div>
                 </div>
 
-                <!-- Agenda Inteligente -->
+                <!-- Agenda Digital Visual -->
                 <div id="agenda-inteligente" class="content-section">
-                    <div class="agenda-container">
-                        <div class="agenda-stats">
-                            <div class="agenda-stat-card">
-                                <div class="agenda-stat-icon icon-gradient-blue">
+                    <div class="agenda-digital-container">
+                        <!-- Header da Agenda -->
+                        <div class="agenda-digital-header">
+                            <div class="agenda-digital-title">
+                                <i class="fas fa-calendar-alt"></i>
+                                <h2>Agenda Digital</h2>
+                            </div>
+                            <div class="agenda-digital-stats">
+                                <div class="stat-badge stat-today">
                                     <i class="fas fa-calendar-day"></i>
+                                    <span id="agenda-stat-hoje">0</span>
+                                    <span class="stat-label">Hoje</span>
                                 </div>
-                                <div class="agenda-stat-content">
-                                    <div class="agenda-stat-value"><span id="agenda-stat-hoje">0</span></div>
-                                    <div class="agenda-stat-label">Hoje</div>
-                                </div>
-                            </div>
-                            <div class="agenda-stat-card">
-                                <div class="agenda-stat-icon icon-gradient-green">
+                                <div class="stat-badge stat-confirmed">
                                     <i class="fas fa-check-circle"></i>
+                                    <span id="agenda-stat-confirmados">0</span>
+                                    <span class="stat-label">Confirmados</span>
                                 </div>
-                                <div class="agenda-stat-content">
-                                    <div class="agenda-stat-value"><span id="agenda-stat-confirmados">0</span></div>
-                                    <div class="agenda-stat-label">Confirmados</div>
-                                </div>
-                            </div>
-                            <div class="agenda-stat-card">
-                                <div class="agenda-stat-icon icon-gradient-orange">
+                                <div class="stat-badge stat-pending">
                                     <i class="fas fa-clock"></i>
-                                </div>
-                                <div class="agenda-stat-content">
-                                    <div class="agenda-stat-value"><span id="agenda-stat-pendentes">0</span></div>
-                                    <div class="agenda-stat-label">Pendentes</div>
+                                    <span id="agenda-stat-pendentes">0</span>
+                                    <span class="stat-label">Pendentes</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="agenda-controls">
-                            <div class="agenda-nav">
-                                <button class="agenda-nav-btn" onclick="previousWeek()" title="Semana Anterior">
+                        <!-- Controles da Agenda -->
+                        <div class="agenda-digital-controls">
+                            <div class="agenda-date-nav">
+                                <button class="date-nav-btn" onclick="previousDay()" title="Dia Anterior">
                                     <i class="fas fa-chevron-left"></i>
                                 </button>
-                                <div class="agenda-current-date" id="agenda-current-week">Carregando...</div>
-                                <button class="agenda-nav-btn" onclick="nextWeek()" title="Próxima Semana">
+                                <div class="current-date-display" id="current-date-display">
+                                    <div class="date-day">Hoje</div>
+                                    <div class="date-full" id="date-full-text">Carregando...</div>
+                                </div>
+                                <button class="date-nav-btn" onclick="nextDay()" title="Próximo Dia">
                                     <i class="fas fa-chevron-right"></i>
                                 </button>
-                                <button class="agenda-nav-btn" onclick="goToToday()" title="Hoje">
+                                <button class="date-nav-btn today-btn" onclick="goToToday()" title="Ir para Hoje">
                                     <i class="fas fa-calendar-day"></i>
+                                    Hoje
                                 </button>
                             </div>
 
-                            <div class="agenda-filters">
-                                <button class="filter-btn active" onclick="setFilter('todos')">Todos</button>
-                                <button class="filter-btn" onclick="setFilter('agendado')">Agendados</button>
-                                <button class="filter-btn" onclick="setFilter('confirmado')">Confirmados</button>
-                                <button class="filter-btn" onclick="setFilter('concluido')">Concluídos</button>
-                                <button class="filter-btn" onclick="setFilter('cancelado')">Cancelados</button>
-                            </div>
-
-                            <div class="view-toggle">
-                                <button class="view-toggle-btn active" onclick="setView('week')">
-                                    <i class="fas fa-calendar-week"></i> Semana
+                            <div class="agenda-quick-filters">
+                                <button class="quick-filter-btn active" onclick="setQuickFilter('todos')" data-filter="todos">
+                                    <i class="fas fa-list"></i> Todos
                                 </button>
-                                <button class="view-toggle-btn" onclick="setView('list')">
-                                    <i class="fas fa-list"></i> Lista
+                                <button class="quick-filter-btn" onclick="setQuickFilter('pendente')" data-filter="pendente">
+                                    <i class="fas fa-clock"></i> Pendentes
                                 </button>
-                                <button class="view-toggle-btn" onclick="setView('day')">
-                                    <i class="fas fa-calendar-day"></i> Hoje
+                                <button class="quick-filter-btn" onclick="setQuickFilter('confirmado')" data-filter="confirmado">
+                                    <i class="fas fa-check"></i> Confirmados
                                 </button>
                             </div>
                         </div>
 
-                        <div id="agenda-inteligente-content">
-                            <div class="empty-state-modern">
-                                <div class="empty-state-icon">
-                                    <i class="fas fa-spinner fa-spin"></i>
-                                </div>
-                                <div class="empty-state-title">Carregando agenda...</div>
+                        <!-- Lista de Agendamentos -->
+                        <div class="agenda-digital-timeline" id="agenda-digital-timeline">
+                            <div class="timeline-loading">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <span>Carregando agendamentos...</span>
                             </div>
                         </div>
                     </div>

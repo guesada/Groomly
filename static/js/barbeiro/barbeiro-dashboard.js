@@ -50,6 +50,8 @@ async function loadProfessionalMetrics() {
         const today = now.toISOString().split('T')[0];
         const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
         
+        console.log('📅 Data de hoje:', today);
+        
         // Agendamentos de hoje
         // Garantir que appointments é um array
         if (!Array.isArray(appointments)) {
@@ -57,15 +59,19 @@ async function loadProfessionalMetrics() {
             throw new Error('Dados de agendamentos inválidos');
         }
         
-        console.log('📅 Filtrando agendamentos para hoje:', today);
-        console.log('📦 Total de agendamentos:', appointments.length);
-        
-        // Normalizar campos: API retorna 'date' e 'time', mas código usa 'data' e 'horario'
+        // Normalizar campos PRIMEIRO: API retorna 'date' e 'time', mas código usa 'data' e 'horario'
         appointments.forEach(a => {
             if (!a.data && a.date) a.data = a.date;
             if (!a.horario && a.time) a.horario = a.time;
             if (!a.preco && a.total_price) a.preco = a.total_price;
             if (!a.cliente_nome && a.cliente) a.cliente_nome = a.cliente;
+        });
+        
+        console.log('📅 Filtrando agendamentos para hoje:', today);
+        console.log('📦 Total de agendamentos:', appointments.length);
+        // Log simplificado das datas
+        appointments.forEach(a => {
+            console.log(`📋 Agendamento ${a.id}: data="${a.data}" vs hoje="${today}" | igual=${a.data === today}`);
         });
         
         const todayAppointments = appointments.filter(a => {
@@ -82,9 +88,16 @@ async function loadProfessionalMetrics() {
             return aptDate === today && a.status === 'concluido';
         });
         
-        const pendingToday = todayAppointments.filter(a => 
-            ['agendado', 'pendente'].includes(a.status)
-        );
+        const pendingToday = todayAppointments.filter(a => ['agendado', 'pendente'].includes(a.status));
+        
+        // Próximos agendamentos (próximos 7 dias)
+        const next7Days = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        const upcomingAppointments = appointments.filter(a => {
+            return a.data >= today && a.data <= next7Days && ['agendado', 'confirmado', 'pendente'].includes(a.status);
+        });
+        
+        console.log('⏳ Pendentes hoje:', pendingToday.length);
+        console.log('📅 Próximos 7 dias:', upcomingAppointments.length);
         
         // Faturamento últimos 7 dias
         const last7Days = appointments.filter(a => {
@@ -110,11 +123,7 @@ async function loadProfessionalMetrics() {
         // Atualizar UI
         updateMetricElement('revenue-7days', revenue7Days.toFixed(2).replace('.', ','));
         
-        console.log('📊 Métricas de hoje:', {
-            total: todayAppointments.length,
-            completed: completedToday.length,
-            pending: pendingToday.length
-        });
+        console.log('📊 Métricas:', `Hoje: ${todayAppointments.length}, Concluídos: ${completedToday.length}, Pendentes: ${pendingToday.length}`);
         
         updateMetricElement('appointments-today', todayAppointments.length);
         updateMetricElement('completed-today', completedToday.length);
@@ -127,12 +136,36 @@ async function loadProfessionalMetrics() {
         updateMetricElement('total-services', completedAppointments.length);
         
         // Atualizar hero stats
-        updateMetricElement('hero-stat-hoje', todayAppointments.length);
-        updateMetricElement('hero-stat-pendentes', pendingToday.length);
-        updateMetricElement('hero-stat-faturamento', revenue7Days.toFixed(2).replace('.', ','));
+        console.log('📊 Atualizando hero:', `Hoje=${todayAppointments.length}, Pendentes=${pendingToday.length}, R$=${revenue7Days.toFixed(2)}`);
+        
+        // Atualizar com verificação
+        const elHoje = document.getElementById('hero-stat-hoje');
+        const elFaturamento = document.getElementById('hero-stat-faturamento');
+        
+        console.log('🔍 Elementos encontrados:', {
+            hoje: !!elHoje,
+            proximos: !!document.getElementById('hero-stat-proximos'),
+            faturamento: !!elFaturamento
+        });
+        
+        if (elHoje) {
+            elHoje.textContent = todayAppointments.length;
+            console.log('✅ Atualizado hero-stat-hoje:', todayAppointments.length);
+        }
+        
+        const elProximos = document.getElementById('hero-stat-proximos');
+        if (elProximos) {
+            elProximos.textContent = upcomingAppointments.length;
+            console.log('✅ Atualizado hero-stat-proximos:', upcomingAppointments.length);
+        }
+        
+        if (elFaturamento) {
+            elFaturamento.textContent = revenue7Days.toFixed(2).replace('.', ',');
+            console.log('✅ Atualizado hero-stat-faturamento:', revenue7Days.toFixed(2));
+        }
         
         // Carregar outros componentes
-        await loadAgendaPreviewData();
+        await loadHeroUpcomingAppointments();
         await loadWeeklyChartData();
         await loadTopServicesData();
         
@@ -168,86 +201,77 @@ function updateMetricElement(id, value) {
     }
 }
 
-// ===== PREVIEW DA AGENDA =====
-async function loadAgendaPreviewData() {
+// ===== PRÓXIMOS AGENDAMENTOS NA HERO =====
+async function loadHeroUpcomingAppointments() {
     try {
-        console.log('📅 Carregando preview da agenda...');
+        console.log('📅 Carregando próximos agendamentos para hero...');
         const today = new Date().toISOString().split('T')[0];
+        const next7Days = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
         
-        // Buscar agendamentos de hoje primeiro
-        let previewAppointments = dashboardState.appointments.filter(a => {
+        // Buscar agendamentos dos próximos 7 dias
+        let upcomingAppointments = dashboardState.appointments.filter(a => {
             const aptDate = a.data;
-            return aptDate === today && ['agendado', 'confirmado', 'pendente'].includes(a.status);
+            return aptDate >= today && aptDate <= next7Days && ['agendado', 'confirmado', 'pendente'].includes(a.status);
         });
         
-        // Se não houver agendamentos hoje, mostrar os próximos
-        if (previewAppointments.length === 0) {
-            previewAppointments = dashboardState.appointments
-                .filter(a => {
-                    const aptDate = a.data;
-                    return aptDate >= today && ['agendado', 'confirmado', 'pendente'].includes(a.status);
-                })
-                .sort((a, b) => {
-                    const dateA = a.data;
-                    const dateB = b.data;
-                    if (dateA !== dateB) return dateA.localeCompare(dateB);
-                    return a.horario.localeCompare(b.horario);
-                });
-        }
+        // Ordenar por data e hora
+        upcomingAppointments.sort((a, b) => {
+            const dateA = a.data;
+            const dateB = b.data;
+            if (dateA !== dateB) return dateA.localeCompare(dateB);
+            return a.horario.localeCompare(b.horario);
+        });
         
-        console.log('📅 Agendamentos para preview:', previewAppointments.length);
-        renderAgendaPreview(previewAppointments, today);
+        console.log('📅 Próximos agendamentos encontrados:', upcomingAppointments.length);
+        renderHeroUpcomingAppointments(upcomingAppointments.slice(0, 5), today);
     } catch (error) {
-        console.error('❌ Erro ao carregar preview da agenda:', error);
+        console.error('❌ Erro ao carregar próximos agendamentos:', error);
     }
 }
 
-function renderAgendaPreview(appointments, today) {
-    const container = document.getElementById('agenda-preview');
+function renderHeroUpcomingAppointments(appointments, today) {
+    const container = document.getElementById('hero-upcoming-list');
     if (!container) return;
     
     if (appointments.length === 0) {
         container.innerHTML = `
-            <div class="empty-agenda">
+            <div class="hero-upcoming-empty">
                 <i class="fas fa-calendar-check"></i>
-                <div class="empty-agenda-title">Nenhum agendamento próximo</div>
-                <div class="empty-agenda-text">Aproveite para organizar seu espaço!</div>
+                <div class="hero-upcoming-empty-title">Nenhum agendamento próximo</div>
+                <div class="hero-upcoming-empty-text">Aproveite para relaxar!</div>
             </div>
         `;
         return;
     }
     
-    // Pegar os próximos 3
-    const next3 = appointments.slice(0, 3);
-    
-    container.innerHTML = next3.map(apt => {
+    container.innerHTML = appointments.map(apt => {
         const aptDate = apt.data;
         const aptTime = apt.horario;
         const aptService = apt.servico;
         const aptClient = apt.cliente_nome;
         const isToday = aptDate === today;
         
-        // Formatar data se não for hoje
-        let dateLabel = '';
-        if (!isToday) {
-            const date = new Date(aptDate + 'T00:00:00');
-            dateLabel = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-        }
+        // Formatar data
+        const date = new Date(aptDate + 'T00:00:00');
+        const dateLabel = isToday ? 'Hoje' : date.toLocaleDateString('pt-BR', { 
+            day: '2-digit', 
+            month: 'short' 
+        });
         
         return `
-            <div class="preview-appointment">
-                <div class="preview-time">
-                    ${aptTime}
-                    ${dateLabel ? `<div style="font-size: 11px; opacity: 0.8;">${dateLabel}</div>` : ''}
+            <div class="hero-upcoming-item">
+                <div class="hero-upcoming-time">
+                    <div class="hero-upcoming-time-hour">${aptTime}</div>
+                    <div class="hero-upcoming-time-date">${dateLabel}</div>
                 </div>
-                <div class="preview-info">
-                    <div class="preview-service">${aptService}</div>
-                    <div class="preview-client">
+                <div class="hero-upcoming-info">
+                    <div class="hero-upcoming-service">${aptService}</div>
+                    <div class="hero-upcoming-client">
                         <i class="fas fa-user"></i>
                         ${aptClient}
                     </div>
                 </div>
-                <div class="preview-status ${apt.status}">${apt.status}</div>
+                <div class="hero-upcoming-status ${apt.status}">${apt.status}</div>
             </div>
         `;
     }).join('');
@@ -391,16 +415,15 @@ function renderTopServices(completedAppointments) {
     `).join('');
 }
 
-// ===== AGENDA INTELIGENTE =====
+// ===== AGENDA DIGITAL VISUAL =====
 let agendaState = {
-    currentWeekStart: null,
+    currentDate: new Date(),
     currentFilter: 'todos',
-    currentView: 'list',
     appointments: []
 };
 
 async function initAgendaInteligente() {
-    console.log('📅 Inicializando Agenda Inteligente...');
+    console.log('📅 Inicializando Agenda Digital...');
     
     try {
         // Carregar agendamentos
@@ -410,18 +433,40 @@ async function initAgendaInteligente() {
         if (result.success) {
             agendaState.appointments = result.data || [];
             console.log('📅 Agendamentos carregados para agenda:', agendaState.appointments.length);
-            renderAgendaInteligente();
+            updateDateDisplay();
+            renderAgendaDigital();
         }
     } catch (error) {
-        console.error('❌ Erro ao carregar agenda inteligente:', error);
+        console.error('❌ Erro ao carregar agenda digital:', error);
     }
 }
 
-function renderAgendaInteligente() {
-    const container = document.getElementById('agenda-inteligente-content');
+function updateDateDisplay() {
+    const dateFullText = document.getElementById('date-full-text');
+    if (!dateFullText) return;
+    
+    const today = new Date().toISOString().split('T')[0];
+    const currentDateStr = agendaState.currentDate.toISOString().split('T')[0];
+    
+    const dateDisplay = document.querySelector('.date-day');
+    if (dateDisplay) {
+        dateDisplay.textContent = currentDateStr === today ? 'Hoje' : 'Data Selecionada';
+    }
+    
+    dateFullText.textContent = agendaState.currentDate.toLocaleDateString('pt-BR', {
+        weekday: 'long',
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+    });
+}
+
+function renderAgendaDigital() {
+    const container = document.getElementById('agenda-digital-timeline');
     if (!container) return;
     
     const today = new Date().toISOString().split('T')[0];
+    const currentDateStr = agendaState.currentDate.toISOString().split('T')[0];
     
     // Normalizar campos
     agendaState.appointments.forEach(a => {
@@ -431,11 +476,16 @@ function renderAgendaInteligente() {
         if (!a.cliente_nome && a.cliente) a.cliente_nome = a.cliente;
     });
     
-    // Filtrar agendamentos
-    let filtered = agendaState.appointments;
+    // Filtrar agendamentos pela data atual
+    let filtered = agendaState.appointments.filter(a => a.data === currentDateStr);
     
+    // Aplicar filtro de status
     if (agendaState.currentFilter !== 'todos') {
-        filtered = filtered.filter(a => a.status === agendaState.currentFilter);
+        if (agendaState.currentFilter === 'pendente') {
+            filtered = filtered.filter(a => ['agendado', 'pendente'].includes(a.status));
+        } else {
+            filtered = filtered.filter(a => a.status === agendaState.currentFilter);
+        }
     }
     
     // Atualizar stats
@@ -452,127 +502,103 @@ function renderAgendaInteligente() {
         ['agendado', 'pendente'].includes(a.status)
     ).length;
     
-    document.getElementById('agenda-stat-hoje').textContent = todayCount;
-    document.getElementById('agenda-stat-confirmados').textContent = confirmedCount;
-    document.getElementById('agenda-stat-pendentes').textContent = pendingCount;
+    const elHoje = document.getElementById('agenda-stat-hoje');
+    const elConfirmados = document.getElementById('agenda-stat-confirmados');
+    const elPendentes = document.getElementById('agenda-stat-pendentes');
+    
+    if (elHoje) elHoje.textContent = todayCount;
+    if (elConfirmados) elConfirmados.textContent = confirmedCount;
+    if (elPendentes) elPendentes.textContent = pendingCount;
     
     // Renderizar lista
     if (filtered.length === 0) {
         container.innerHTML = `
-            <div class="empty-state-modern">
-                <div class="empty-state-icon">
-                    <i class="fas fa-calendar-times"></i>
+            <div class="timeline-empty">
+                <div class="timeline-empty-icon">
+                    <i class="fas fa-calendar-check"></i>
                 </div>
-                <div class="empty-state-title">Nenhum agendamento encontrado</div>
+                <div class="timeline-empty-title">Nenhum agendamento neste dia</div>
+                <div class="timeline-empty-text">Aproveite para relaxar ou organizar seu espaço!</div>
             </div>
         `;
         return;
     }
     
-    // Ordenar por data e hora (mais recentes primeiro)
-    filtered.sort((a, b) => {
-        const dateA = a.data;
-        const dateB = b.data;
-        if (dateA !== dateB) return dateA.localeCompare(dateB);
-        const timeA = a.horario;
-        const timeB = b.horario;
-        return timeA.localeCompare(timeB);
-    });
+    // Ordenar por horário
+    filtered.sort((a, b) => a.horario.localeCompare(b.horario));
     
-    // Agrupar por data
-    const groupedByDate = {};
-    filtered.forEach(apt => {
-        const date = apt.data;
-        if (!groupedByDate[date]) {
-            groupedByDate[date] = [];
-        }
-        groupedByDate[date].push(apt);
-    });
-    
-    // Renderizar agrupado por data
-    const dates = Object.keys(groupedByDate).sort();
-    
-    container.innerHTML = `
-        <div class="agenda-by-date">
-            ${dates.map(date => {
-                const appointments = groupedByDate[date];
-                const dateObj = new Date(date + 'T00:00:00');
-                const isToday = date === today;
-                const dayName = dateObj.toLocaleDateString('pt-BR', { weekday: 'long' });
-                const dateFormatted = dateObj.toLocaleDateString('pt-BR', { 
-                    day: '2-digit', 
-                    month: 'long',
-                    year: 'numeric'
-                });
-                
-                return `
-                    <div class="date-group ${isToday ? 'today' : ''}">
-                        <div class="date-group-header">
-                            <div class="date-group-title">
-                                <i class="fas fa-calendar-day"></i>
-                                <span class="day-name">${dayName.charAt(0).toUpperCase() + dayName.slice(1)}</span>
-                                ${isToday ? '<span class="today-badge">Hoje</span>' : ''}
-                            </div>
-                            <div class="date-group-subtitle">${dateFormatted}</div>
-                            <div class="date-group-count">${appointments.length} ${appointments.length === 1 ? 'agendamento' : 'agendamentos'}</div>
-                        </div>
-                        <div class="date-group-appointments">
-                            ${appointments.map(apt => renderAppointmentCard(apt, today)).join('')}
-                        </div>
-                    </div>
-                `;
-            }).join('')}
-        </div>
-    `;
+    // Renderizar cards
+    container.innerHTML = filtered.map(apt => renderAppointmentCardModern(apt)).join('');
 }
 
-function renderAppointmentCard(apt, today) {
-    const aptDate = apt.data;
+function renderAppointmentCardModern(apt) {
     const aptTime = apt.horario;
     const aptService = apt.servico;
     const aptClient = apt.cliente_nome;
     const aptPrice = apt.preco;
     const aptId = apt.id;
+    const aptStatus = apt.status;
     
-    console.log('📋 Renderizando card:', { aptId, aptPrice, apt });
-    
-    const date = new Date(aptDate + 'T00:00:00');
-    const dateFormatted = date.toLocaleDateString('pt-BR', { 
-        day: '2-digit', 
-        month: 'long',
-        year: 'numeric'
-    });
+    const isCompleted = aptStatus === 'concluido';
+    const isCanceled = aptStatus === 'cancelado';
+    const canComplete = ['agendado', 'confirmado', 'pendente'].includes(aptStatus);
     
     return `
-        <div class="appointment-card-agenda status-${apt.status}">
-            <div class="appointment-card-header">
-                <div class="appointment-card-info">
-                    <div class="appointment-card-time">${aptTime}</div>
-                    <div style="font-size: 13px; color: var(--color-text-secondary); margin-bottom: 8px;">
-                        ${dateFormatted}
+        <div class="appointment-card-modern status-${aptStatus}">
+            ${canComplete ? `
+                <div class="appointment-checkbox">
+                    <label class="checkbox-wrapper">
+                        <input type="checkbox" class="checkbox-input" 
+                               onchange="handleCheckboxChange('${aptId}', this.checked)"
+                               ${isCompleted ? 'checked' : ''}>
+                        <span class="checkbox-custom">
+                            <i class="fas fa-check"></i>
+                        </span>
+                    </label>
+                </div>
+            ` : ''}
+            
+            <div class="appointment-card-content">
+                <div class="appointment-card-main">
+                    <div class="appointment-card-info">
+                        <div class="appointment-time-badge">
+                            <i class="fas fa-clock"></i>
+                            <span class="appointment-time-text">${aptTime}</span>
+                        </div>
+                        
+                        <div class="appointment-service-name">${aptService}</div>
+                        
+                        <div class="appointment-client-info">
+                            <i class="fas fa-user"></i>
+                            <span>${aptClient}</span>
+                        </div>
+                        
+                        <div class="appointment-price">
+                            R$ ${parseFloat(aptPrice).toFixed(2).replace('.', ',')}
+                        </div>
                     </div>
-                    <div class="appointment-card-service">${aptService}</div>
-                    <div class="appointment-card-client">
-                        <i class="fas fa-user"></i>
-                        ${aptClient}
-                    </div>
-                    <div style="font-size: 14px; color: var(--color-text); margin-top: 8px; font-weight: 600;">
-                        R$ ${parseFloat(aptPrice).toFixed(2).replace('.', ',')}
+                    
+                    <div class="appointment-status-badge ${aptStatus}">
+                        ${aptStatus}
                     </div>
                 </div>
+                
                 <div class="appointment-card-actions">
-                    ${apt.status === 'agendado' || apt.status === 'pendente' ? `
-                        <button class="action-btn action-btn-confirm" onclick="updateAppointmentStatus('${aptId}', 'confirmado')">
+                    ${aptStatus === 'agendado' || aptStatus === 'pendente' ? `
+                        <button class="action-btn-modern action-btn-confirm" 
+                                onclick="updateAppointmentStatus('${aptId}', 'confirmado')">
                             <i class="fas fa-check"></i> Confirmar
                         </button>
                     ` : ''}
-                    ${apt.status === 'confirmado' ? `
-                        <button class="action-btn action-btn-complete" onclick="updateAppointmentStatus('${aptId}', 'concluido')">
+                    ${aptStatus === 'confirmado' ? `
+                        <button class="action-btn-modern action-btn-complete" 
+                                onclick="updateAppointmentStatus('${aptId}', 'concluido')">
                             <i class="fas fa-check-double"></i> Concluir
                         </button>
                     ` : ''}
-                    ${apt.status !== 'cancelado' && apt.status !== 'concluido' ? `
-                        <button class="action-btn action-btn-cancel" onclick="updateAppointmentStatus('${aptId}', 'cancelado')">
+                    ${!isCanceled && !isCompleted ? `
+                        <button class="action-btn-modern action-btn-cancel" 
+                                onclick="updateAppointmentStatus('${aptId}', 'cancelado')">
                             <i class="fas fa-times"></i> Cancelar
                         </button>
                     ` : ''}
@@ -580,6 +606,11 @@ function renderAppointmentCard(apt, today) {
             </div>
         </div>
     `;
+}
+
+async function handleCheckboxChange(appointmentId, isChecked) {
+    const newStatus = isChecked ? 'concluido' : 'confirmado';
+    await updateAppointmentStatus(appointmentId, newStatus);
 }
 
 async function updateAppointmentStatus(appointmentId, newStatus) {
@@ -596,6 +627,15 @@ async function updateAppointmentStatus(appointmentId, newStatus) {
             console.log('✅ Status atualizado com sucesso');
             await initAgendaInteligente();
             await loadProfessionalMetrics();
+            
+            if (typeof showNotificationToast === 'function') {
+                const messages = {
+                    'confirmado': 'Agendamento confirmado!',
+                    'concluido': 'Agendamento concluído!',
+                    'cancelado': 'Agendamento cancelado'
+                };
+                showNotificationToast(messages[newStatus] || 'Status atualizado', 'success');
+            }
         } else {
             alert('Erro ao atualizar status: ' + result.message);
         }
@@ -605,41 +645,36 @@ async function updateAppointmentStatus(appointmentId, newStatus) {
     }
 }
 
-function setFilter(filter) {
+function setQuickFilter(filter) {
     agendaState.currentFilter = filter;
     
     // Atualizar botões
-    document.querySelectorAll('.filter-btn').forEach(btn => {
+    document.querySelectorAll('.quick-filter-btn').forEach(btn => {
         btn.classList.remove('active');
+        if (btn.dataset.filter === filter) {
+            btn.classList.add('active');
+        }
     });
-    event.target.classList.add('active');
     
-    renderAgendaInteligente();
+    renderAgendaDigital();
 }
 
-function setView(view) {
-    agendaState.currentView = view;
-    
-    // Atualizar botões
-    document.querySelectorAll('.view-toggle-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    event.target.classList.add('active');
-    
-    renderAgendaInteligente();
+function previousDay() {
+    agendaState.currentDate.setDate(agendaState.currentDate.getDate() - 1);
+    updateDateDisplay();
+    renderAgendaDigital();
 }
 
-function previousWeek() {
-    console.log('⬅️ Semana anterior');
-}
-
-function nextWeek() {
-    console.log('➡️ Próxima semana');
+function nextDay() {
+    agendaState.currentDate.setDate(agendaState.currentDate.getDate() + 1);
+    updateDateDisplay();
+    renderAgendaDigital();
 }
 
 function goToToday() {
-    console.log('📅 Ir para hoje');
-    renderAgendaInteligente();
+    agendaState.currentDate = new Date();
+    updateDateDisplay();
+    renderAgendaDigital();
 }
 
 // ===== ATUALIZAÇÃO AUTOMÁTICA =====
@@ -649,7 +684,7 @@ function startAutoRefresh() {
         if (!dashboardState.loading) {
             console.log('🔄 Atualizando dashboard...');
             await loadProfessionalMetrics();
-            await loadAgendaPreviewData();
+            await loadHeroUpcomingAppointments();
         }
     }, 30000);
 }
@@ -657,15 +692,16 @@ function startAutoRefresh() {
 // ===== EXPORTAR FUNÇÕES =====
 window.initBarbeiroDashboard = initBarbeiroDashboard;
 window.loadProfessionalMetrics = loadProfessionalMetrics;
-window.loadAgendaPreviewData = loadAgendaPreviewData;
+window.loadHeroUpcomingAppointments = loadHeroUpcomingAppointments;
+
 window.loadWeeklyChartData = loadWeeklyChartData;
 window.loadTopServicesData = loadTopServicesData;
 window.initAgendaInteligente = initAgendaInteligente;
+window.handleCheckboxChange = handleCheckboxChange;
 window.updateAppointmentStatus = updateAppointmentStatus;
-window.setFilter = setFilter;
-window.setView = setView;
-window.previousWeek = previousWeek;
-window.nextWeek = nextWeek;
+window.setQuickFilter = setQuickFilter;
+window.previousDay = previousDay;
+window.nextDay = nextDay;
 window.goToToday = goToToday;
 
 // Verificar dependências
