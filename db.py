@@ -161,4 +161,24 @@ class Report(db.Model):
     dados = db.Column(LONGTEXT)
 
     def to_dict(self):
-        return {"id": self.id, "nome": self.nome, "dados": json.loads(self.dados or "{}")} 
+        return {"id": self.id, "nome": self.nome, "dados": json.loads(self.dados or "{}")}
+
+
+class BarberPrice(db.Model):
+    """Preços personalizados de cada barbeiro para cada serviço"""
+    __tablename__ = "barber_prices"
+    id = db.Column(db.Integer, primary_key=True)
+    barbeiro_id = db.Column(db.Integer, db.ForeignKey('barbers.id'), nullable=False)
+    servico_nome = db.Column(db.String(100), nullable=False)  # 'Corte', 'Barba', 'Corte + Barba'
+    preco = db.Column(db.Float, nullable=False)
+    
+    # Índice único para evitar duplicatas
+    __table_args__ = (db.UniqueConstraint('barbeiro_id', 'servico_nome', name='_barbeiro_servico_uc'),)
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "barbeiro_id": self.barbeiro_id,
+            "servico_nome": self.servico_nome,
+            "preco": self.preco
+        } 
