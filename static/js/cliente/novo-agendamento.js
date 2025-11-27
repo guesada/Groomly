@@ -464,7 +464,8 @@ async function confirmarNovoAgendamento() {
     
     const data = await res.json();
     
-    if (data.success) {
+    // Verificar se foi sucesso (201 Created ou 200 OK)
+    if (res.ok || res.status === 201 || data.success) {
       showNotificationToast('Agendamento criado com sucesso!', 'success');
       
       // Resetar estado
@@ -475,7 +476,9 @@ async function confirmarNovoAgendamento() {
         date: null,
         time: null,
         services: bookingState.services,
-        barbers: bookingState.barbers
+        barbers: bookingState.barbers,
+        currentMonth: new Date().getMonth(),
+        currentYear: new Date().getFullYear()
       };
       
       // Voltar para lista de agendamentos
