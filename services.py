@@ -131,7 +131,10 @@ def list_barbers() -> List[Dict[str, Any]]:
 
 
 def list_services() -> List[Dict[str, Any]]:
-    return [s.to_dict() for s in Service.query.all()]
+    # Retornar apenas os 3 serviços básicos
+    return [s.to_dict() for s in Service.query.filter(
+        Service.nome.in_(['Corte', 'Barba', 'Corte + Barba'])
+    ).all()]
 
 
 def list_notifications() -> List[Dict[str, Any]]:

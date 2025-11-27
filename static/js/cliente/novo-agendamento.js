@@ -33,10 +33,16 @@ async function initNovoAgendamento() {
 // Carregar serviços
 async function loadServicesData() {
   try {
-    const res = await fetch('/api/services', { credentials: 'include' });
+    // Adicionar timestamp para evitar cache
+    const timestamp = new Date().getTime();
+    const res = await fetch(`/api/services?_=${timestamp}`, { 
+      credentials: 'include',
+      cache: 'no-cache'
+    });
     if (!res.ok) return;
     const data = await res.json();
     bookingState.services = data.data || [];
+    console.log('📦 Serviços carregados:', bookingState.services);
     renderServices();
   } catch (error) {
     console.error('Erro ao carregar serviços:', error);
@@ -62,34 +68,68 @@ function renderServices() {
   
   if (bookingState.services.length === 0) {
     container.innerHTML = `
-      <div style="grid-column: 1/-1; text-align: center; padding: 3rem;">
-        <i class="fas fa-cut" style="font-size: 3rem; color: #6366f1; opacity: 0.3; margin-bottom: 1rem;"></i>
-        <p style="color: var(--color-text-secondary);">Nenhum serviço disponível no momento.</p>
+      <div class="empty-state-services">
+        <div class="empty-state-icon">
+          <i class="fas fa-cut"></i>
+        </div>
+        <div class="empty-state-title">Nenhum serviço disponível</div>
+        <div class="empty-state-text">Entre em contato para mais informações</div>
       </div>
     `;
     return;
   }
   
-  container.innerHTML = bookingState.services.map(service => `
-    <div class="service-card ${bookingState.service?.id === service.id ? 'selected' : ''}" 
-         onclick="selectService(${service.id})">
-      <div class="service-check">
-        <i class="fas fa-check"></i>
-      </div>
-      <div class="service-icon">
-        <i class="fas fa-cut"></i>
-      </div>
-      <div class="service-name">${service.nome || 'Serviço'}</div>
-      <div class="service-description">${service.descricao || 'Serviço profissional de barbearia'}</div>
-      <div class="service-details">
-        <div class="service-price">R$ ${parseFloat(service.preco || 0).toFixed(2)}</div>
-        <div class="service-duration">
-          <i class="fas fa-clock"></i>
-          ${service.duracao || '30'} min
+  // Ícones específicos para cada serviço
+  const serviceIcons = {
+    'Corte': 'fa-cut',
+    'Barba': 'fa-user-tie',
+    'Corte + Barba': 'fa-scissors'
+  };
+  
+  container.innerHTML = bookingState.services.map((service, index) => {
+    const isSelected = bookingState.service?.id === service.id;
+    const icon = serviceIcons[service.nome] || 'fa-cut';
+    const animationDelay = index * 0.1;
+    
+    return `
+      <div class="service-card-modern ${isSelected ? 'selected' : ''}" 
+           onclick="selectService(${service.id})"
+           style="animation-delay: ${animationDelay}s">
+        
+        <!-- Badge de seleção -->
+        <div class="service-selection-badge">
+          <i class="fas fa-check-circle"></i>
         </div>
+        
+        <!-- Ícone do serviço -->
+        <div class="service-icon-modern">
+          <div class="service-icon-bg"></div>
+          <i class="fas ${icon}"></i>
+        </div>
+        
+        <!-- Informações do serviço -->
+        <div class="service-info-modern">
+          <h4 class="service-title-modern">${service.nome || 'Serviço'}</h4>
+          <p class="service-desc-modern">${service.descricao || 'Serviço profissional de barbearia'}</p>
+        </div>
+        
+        <!-- Detalhes (preço e duração) -->
+        <div class="service-footer-modern">
+          <div class="service-price-modern">
+            <span class="price-label">A partir de</span>
+            <span class="price-value">R$ ${parseFloat(service.preco || 0).toFixed(2).replace('.', ',')}</span>
+          </div>
+          <div class="service-duration-modern">
+            <i class="fas fa-clock"></i>
+            <span>${service.duracao || '30'} min</span>
+          </div>
+        </div>
+        
+        <!-- Efeito hover -->
+        <div class="service-hover-effect"></div>
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 // Selecionar serviço
