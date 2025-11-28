@@ -22,10 +22,10 @@ async function initNovoAgendamento() {
   bookingState.currentYear = today.getFullYear();
   
   // Carregar dados
-  await loadServicesData();
-  await loadBarbersData();
+  await loadBarbersData(); // Carregar barbeiros primeiro
+  await loadServicesData(); // Serviços depois
   
-  // Renderizar primeira etapa
+  // Renderizar primeira etapa (barbeiros)
   renderStep(1);
   updateProgress();
 }
@@ -181,13 +181,46 @@ function renderBarbers() {
 }
 
 // Selecionar barbeiro
-function selectBarber(barberId) {
+async function selectBarber(barberId) {
   const barber = bookingState.barbers.find(b => b.id === barberId);
   if (!barber) return;
   
   bookingState.barber = barber;
   renderBarbers();
+  
+  // Carregar preços personalizados do barbeiro
+  console.log('💰 Carregando preços do barbeiro:', barberId);
+  await loadBarberPrices(barberId);
+  
   updateNextButton();
+}
+
+// Carregar preços personalizados do barbeiro
+async function loadBarberPrices(barberId) {
+  try {
+    const response = await fetch(`/api/barber-prices?barbeiro_id=${barberId}`);
+    const result = await response.json();
+    
+    if (result.success && result.data) {
+      console.log('💰 Preços recebidos:', result.data);
+      
+      // Atualizar preços dos serviços
+      bookingState.services.forEach(service => {
+        const customPrice = result.data[service.nome];
+        if (customPrice !== undefined) {
+          service.preco = customPrice;
+          console.log(`✅ Preço atualizado: ${service.nome} = R$ ${customPrice}`);
+        }
+      });
+      
+      // Re-renderizar serviços se já estiver na etapa de serviços
+      if (bookingState.currentStep === 2) {
+        renderServices();
+      }
+    }
+  } catch (error) {
+    console.error('❌ Erro ao carregar preços do barbeiro:', error);
+  }
 }
 
 // Renderizar calendário
@@ -401,9 +434,9 @@ function renderStep(step) {
   
   // Renderizar conteúdo específico
   if (step === 1) {
-    renderServices();
+    renderBarbers(); // Primeiro escolhe o barbeiro
   } else if (step === 2) {
-    renderBarbers();
+    renderServices(); // Depois escolhe o serviço (com preços atualizados)
   } else if (step === 3) {
     renderCalendar();
     if (bookingState.date) {
@@ -467,10 +500,10 @@ function updateNextButton() {
   let canProceed = false;
   
   if (bookingState.currentStep === 1) {
-    canProceed = bookingState.service !== null;
+    canProceed = bookingState.barber !== null; // Primeiro escolhe barbeiro
     btn.innerHTML = '<span>Próximo</span><i class="fas fa-arrow-right"></i>';
   } else if (bookingState.currentStep === 2) {
-    canProceed = bookingState.barber !== null;
+    canProceed = bookingState.service !== null; // Depois escolhe serviço
     btn.innerHTML = '<span>Próximo</span><i class="fas fa-arrow-right"></i>';
   } else if (bookingState.currentStep === 3) {
     canProceed = bookingState.date !== null && bookingState.time !== null;
