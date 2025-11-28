@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/barbeiro/header-modern.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/barbeiro/agenda-inteligente.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/barbeiro/precos.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/barbeiro/estoque.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/barbeiro/barbeiro-professional.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -435,6 +436,7 @@
     <script src="{{ url_for('static', filename='js/shared/micro-interactions.js') }}"></script>
     <script src="{{ url_for('static', filename='js/barbeiro/barbeiro-dashboard.js') }}"></script>
     <script src="{{ url_for('static', filename='js/barbeiro/precos.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/barbeiro/estoque.js') }}"></script>
     <script src="{{ url_for('static', filename='js/index.js') }}"></script>
     
     <script>
@@ -464,6 +466,10 @@
             
             if (sectionId === 'precos-barbeiro' && typeof initPrecos === 'function') {
                 initPrecos();
+            }
+            
+            if (sectionId === 'estoque-barbeiro' && typeof initEstoque === 'function') {
+                initEstoque();
             }
         }
         
