@@ -220,6 +220,14 @@ def create_appointment(body: Dict[str, Any]) -> Dict[str, Any]:
     if not usuario:
         raise ValueError("Usuário não autenticado")
     
+    # Validar se não é horário passado
+    appointment_date = body["date"]
+    appointment_time = body["time"]
+    appointment_datetime = datetime.strptime(f"{appointment_date} {appointment_time}", "%Y-%m-%d %H:%M")
+    
+    if appointment_datetime <= datetime.now():
+        raise ValueError("Não é possível agendar em horários passados")
+    
     # Gerar ID único
     last = Appointment.query.order_by(Appointment.id.desc()).first()
     if last and last.id.startswith('APT'):
