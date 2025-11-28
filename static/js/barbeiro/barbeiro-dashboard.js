@@ -555,6 +555,7 @@ function refreshAgenda() {
 
 function renderAppointmentCardModern(apt) {
     const aptTime = apt.horario;
+    const aptDate = apt.data;
     const aptService = apt.servico;
     const aptClient = apt.cliente_nome;
     const aptPrice = apt.preco;
@@ -563,10 +564,19 @@ function renderAppointmentCardModern(apt) {
     
     const isCompleted = aptStatus === 'concluido';
     const isCanceled = aptStatus === 'cancelado';
-    const canComplete = ['agendado', 'confirmado', 'pendente'].includes(aptStatus);
+    
+    // Verificar se o agendamento já passou
+    const now = new Date();
+    const appointmentDateTime = new Date(`${aptDate}T${aptTime}`);
+    const hasPassed = appointmentDateTime <= now;
+    
+    // Lógica inteligente de ações
+    const canConfirm = (aptStatus === 'agendado' || aptStatus === 'pendente') && !hasPassed;
+    const canComplete = (aptStatus === 'confirmado' || aptStatus === 'agendado') && hasPassed;
+    const canCancel = !isCanceled && !isCompleted;
     
     return `
-        <div class="appointment-card-modern status-${aptStatus}">
+        <div class="appointment-card-modern status-${aptStatus} ${hasPassed ? 'past-appointment' : ''}">
             ${canComplete ? `
                 <div class="appointment-checkbox">
                     <label class="checkbox-wrapper">
@@ -607,19 +617,19 @@ function renderAppointmentCardModern(apt) {
                 </div>
                 
                 <div class="appointment-card-actions">
-                    ${aptStatus === 'agendado' || aptStatus === 'pendente' ? `
+                    ${canConfirm ? `
                         <button class="action-btn-modern action-btn-confirm" 
                                 onclick="updateAppointmentStatus('${aptId}', 'confirmado')">
                             <i class="fas fa-check"></i> Confirmar
                         </button>
                     ` : ''}
-                    ${aptStatus === 'confirmado' ? `
+                    ${canComplete ? `
                         <button class="action-btn-modern action-btn-complete" 
                                 onclick="updateAppointmentStatus('${aptId}', 'concluido')">
                             <i class="fas fa-check-double"></i> Concluir
                         </button>
                     ` : ''}
-                    ${!isCanceled && !isCompleted ? `
+                    ${canCancel ? `
                         <button class="action-btn-modern action-btn-cancel" 
                                 onclick="updateAppointmentStatus('${aptId}', 'cancelado')">
                             <i class="fas fa-times"></i> Cancelar
