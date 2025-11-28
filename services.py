@@ -13,7 +13,7 @@ from typing import Any, Dict, List, Optional
 
 from flask import session, current_app
 
-from db import db, Cliente, Barber, Service, Appointment, Product, Report, DEFAULT_HORARIOS
+from db import db, Cliente, Barber, Service, Appointment, Report, DEFAULT_HORARIOS
 
 
 def init_app(app):
@@ -144,52 +144,6 @@ def list_notifications() -> List[Dict[str, Any]]:
 def report_week() -> Dict[str, Any]:
     r = Report.query.filter_by(nome="ultima_semana").first()
     return r.to_dict()["dados"] if r else {}
-
-
-def list_products() -> List[Dict[str, Any]]:
-    return [p.to_dict() for p in Product.query.all()]
-
-
-def create_product(data: Dict[str, Any]) -> Dict[str, Any]:
-    prod = Product(
-        produto=data.get("name"),
-        quantidade=int(data.get("quantity", 0)),
-        preco_custo=float(data.get("price", 0)),
-        fornecedor=data.get("supplier"),
-        categoria=data.get("category"),
-        descricao=data.get("description"),
-    )
-    db.session.add(prod)
-    db.session.commit()
-    return prod.to_dict()
-
-
-def get_product(product_id: int) -> Optional[Dict[str, Any]]:
-    p = Product.query.get(product_id)
-    return p.to_dict() if p else None
-
-
-def update_product(product_id: int, data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-    p = Product.query.get(product_id)
-    if not p:
-        return None
-    p.produto = data.get("name", p.produto)
-    p.quantidade = int(data.get("quantity", p.quantidade))
-    p.preco_custo = float(data.get("price", p.preco_custo))
-    p.fornecedor = data.get("supplier", p.fornecedor)
-    p.categoria = data.get("category", p.categoria)
-    p.descricao = data.get("description", p.descricao)
-    db.session.commit()
-    return p.to_dict()
-
-
-def delete_product(product_id: int) -> bool:
-    p = Product.query.get(product_id)
-    if not p:
-        return False
-    db.session.delete(p)
-    db.session.commit()
-    return True
 
 
 def list_appointments_for_user() -> List[Dict[str, Any]]:

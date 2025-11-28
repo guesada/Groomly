@@ -1,6 +1,6 @@
 """Registro das rotas (blueprints) do Corte Digital."""
 
-from . import appointments, auth, info, inventory, pages, barber_prices
+from . import appointments, auth, info, pages, barber_prices
 
 
 def register_routes(app):
@@ -10,5 +10,4 @@ def register_routes(app):
     app.register_blueprint(auth.auth_bp)
     app.register_blueprint(info.info_bp)
     app.register_blueprint(appointments.appointments_bp)
-    app.register_blueprint(inventory.inventory_bp)
     app.register_blueprint(barber_prices.barber_prices_bp)

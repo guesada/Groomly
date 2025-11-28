@@ -13,7 +13,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/barbeiro/header-modern.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/barbeiro/agenda-inteligente.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/barbeiro/precos.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/barbeiro/estoque.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/barbeiro/barbeiro-professional.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -46,10 +45,6 @@
                     <button class="nav-item" onclick="showSection('precos-barbeiro')" data-section="precos-barbeiro">
                         <i class="fas fa-dollar-sign"></i>
                         <span>Preços</span>
-                    </button>
-                    <button class="nav-item" onclick="showSection('estoque-barbeiro')" data-section="estoque-barbeiro">
-                        <i class="fas fa-box"></i>
-                        <span>Estoque</span>
                     </button>
                 </nav>
 
@@ -372,51 +367,6 @@
                     </div>
                 </div>
 
-                <!-- Estoque -->
-                <div id="estoque-barbeiro" class="content-section">
-                    <div class="section-header" style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
-                        <div class="custom-icon icon-gradient-orange" style="width: 40px; height: 40px; font-size: 20px; color: white;">
-                            <i class="fas fa-box"></i>
-                        </div>
-                        <h2 style="margin: 0;">Gerenciar Estoque</h2>
-                    </div>
-
-                    <div class="elegant-card" style="margin-bottom: 24px; padding: 24px;">
-                        <h3 style="font-size: 16px; font-weight: 600; color: var(--color-text); margin-bottom: 20px;">Adicionar Novo Produto</h3>
-                        <form id="product-form" onsubmit="handleProductSubmit(event)">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label class="form-label">Nome do Produto</label>
-                                    <input id="prod-name" type="text" class="form-control" placeholder="Ex: Shampoo Profissional" required>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Quantidade</label>
-                                    <input id="prod-qty" type="number" min="0" class="form-control" placeholder="0" required>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Preço de Custo</label>
-                                    <input id="prod-price" type="number" step="0.01" min="0" class="form-control" placeholder="0.00" required>
-                                </div>
-                            </div>
-                            <button type="submit" class="btn btn--primary btn-modern">
-                                <i class="fas fa-plus"></i> Adicionar Produto
-                            </button>
-                        </form>
-                    </div>
-
-                    <div>
-                        <h3 style="font-size: 16px; font-weight: 600; color: var(--color-text); margin-bottom: 16px;">Produtos Cadastrados</h3>
-                        <div id="products-list">
-                            <div class="empty-state-modern">
-                                <div class="empty-state-icon">
-                                    <i class="fas fa-box-open"></i>
-                                </div>
-                                <div class="empty-state-title">Carregando produtos...</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
             </main>
         </div>
     </div>
@@ -430,7 +380,6 @@
     <script src="{{ url_for('static', filename='js/shared/micro-interactions.js') }}"></script>
     <script src="{{ url_for('static', filename='js/barbeiro/barbeiro-dashboard.js') }}"></script>
     <script src="{{ url_for('static', filename='js/barbeiro/precos.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/barbeiro/estoque.js') }}"></script>
     <script src="{{ url_for('static', filename='js/index.js') }}"></script>
     
     <script>
@@ -462,9 +411,7 @@
                 initPrecos();
             }
             
-            if (sectionId === 'estoque-barbeiro' && typeof initEstoque === 'function') {
-                initEstoque();
-            }
+
         }
         
         function toggleUserMenu() {
