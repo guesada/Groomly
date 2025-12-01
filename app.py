@@ -18,7 +18,7 @@ CORS(app, supports_credentials=True, origins=["http://localhost:5001", "http://1
 
 # Inicializa SocketIO para comunicação em tempo real
 socketio = SocketIO(app, cors_allowed_origins=["http://localhost:5001", "http://127.0.0.1:5001"], 
-                    manage_session=False, async_mode='eventlet')
+                    manage_session=False, async_mode='threading')
 
 # Chave secreta para criptografia de sessões e cookies
 app.secret_key = "corte_digital_2025_secret_key"
