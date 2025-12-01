@@ -491,8 +491,13 @@ class ChatSystem {
     }
     
     getUserType() {
-        // Obtém tipo de usuário da sessão (implementar conforme sua lógica)
+        // Obtém tipo de usuário da sessão
         return window.userType || 'cliente';
+    }
+    
+    getUserId() {
+        // Obtém ID do usuário (será definido no template)
+        return window.userId || null;
     }
     
     // Método público para iniciar conversa com usuário específico
