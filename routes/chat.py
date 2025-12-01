@@ -201,3 +201,37 @@ def mark_read(conversation_id):
         return jsonify({'success': True})
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@chat_bp.route('/users/<user_type>', methods=['GET'])
+def get_users_by_type(user_type):
+    """Obtém lista de usuários por tipo (para iniciar nova conversa)"""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Não autenticado'}), 401
+    
+    try:
+        from database_config import get_database_connection
+        conn = get_database_connection()
+        cursor = conn.cursor()
+        
+        if user_type == 'barbeiro':
+            cursor.execute("""
+                SELECT id, nome FROM barbers
+                ORDER BY nome
+            """)
+        else:
+            cursor.execute("""
+                SELECT id, nome FROM clientes
+                ORDER BY nome
+            """)
+        
+        users = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'users': users
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
