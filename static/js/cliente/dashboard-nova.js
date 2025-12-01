@@ -30,7 +30,7 @@ async function loadClienteDashboard() {
         ).length;
         
         const concluidos = appointments.filter(a => 
-            a.status === 'concluido'
+            a.status === 'concluido' || a.status === 'concluído'
         ).length;
         
         // Próximo agendamento
@@ -222,6 +222,7 @@ async function carregarAgendamentos() {
                 'agendado': 'AGENDADO',
                 'confirmado': 'CONFIRMADO',
                 'concluido': 'CONCLUÍDO',
+                'concluído': 'CONCLUÍDO',
                 'cancelado': 'CANCELADO'
             };
             
@@ -278,7 +279,7 @@ async function carregarAgendamentos() {
                         const now = new Date();
                         const appointmentDateTime = new Date(`${apt.date}T${apt.time}`);
                         const hasPassed = appointmentDateTime <= now;
-                        const canCancel = aptStatus !== 'cancelado' && aptStatus !== 'concluido' && !hasPassed;
+                        const canCancel = aptStatus !== 'cancelado' && aptStatus !== 'concluido' && aptStatus !== 'concluído' && !hasPassed;
                         
                         if (canCancel) {
                             return `
@@ -289,7 +290,7 @@ async function carregarAgendamentos() {
                                     </button>
                                 </div>
                             `;
-                        } else if (hasPassed && aptStatus !== 'cancelado' && aptStatus !== 'concluido') {
+                        } else if (hasPassed && aptStatus !== 'cancelado' && aptStatus !== 'concluido' && aptStatus !== 'concluído') {
                             return `
                                 <div class="agendamento-info-message">
                                     <i class="fas fa-info-circle"></i>
@@ -465,8 +466,10 @@ async function loadHistoricoCliente() {
             if (!a.barbeiro && a.barber_name) a.barbeiro = a.barber_name;
         });
         
-        // Filtrar apenas concluídos
-        const concluidos = appointments.filter(a => a.status === 'concluido');
+        // Filtrar apenas concluídos (com ou sem acento)
+        const concluidos = appointments.filter(a => 
+            a.status === 'concluido' || a.status === 'concluído'
+        );
         
         console.log('✅ Agendamentos concluídos:', concluidos.length);
         

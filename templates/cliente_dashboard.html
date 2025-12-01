@@ -59,9 +59,6 @@
 
                 <!-- Actions -->
                 <div class="cliente-header-actions">
-                    <button class="action-btn" onclick="toggleTheme()" title="Alternar Tema">
-                        <i class="fas fa-moon" id="theme-icon"></i>
-                    </button>
                     <div class="user-menu">
                         <button class="user-menu-btn" onclick="toggleUserMenu()">
                             <div class="user-avatar">{{ nome[0] if nome else 'C' }}</div>
@@ -69,10 +66,6 @@
                             <i class="fas fa-chevron-down"></i>
                         </button>
                         <div class="user-menu-dropdown" id="user-menu-dropdown">
-                            <a href="#" onclick="showSection('perfil-cliente'); return false;" class="menu-item">
-                                <i class="fas fa-user-circle"></i>
-                                <span>Meu Perfil</span>
-                            </a>
                             <a href="#" onclick="logout(); return false;" class="menu-item">
                                 <i class="fas fa-sign-out-alt"></i>
                                 <span>Sair</span>
@@ -319,70 +312,7 @@
                     </div>
                 </div>
 
-                <!-- Perfil Cliente -->
-                <div id="perfil-cliente" class="content-section">
-                    <div class="section-header" style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
-                        <div class="custom-icon icon-gradient-orange" style="width: 40px; height: 40px; font-size: 20px;">
-                            <i class="fas fa-user-circle"></i>
-                        </div>
-                        <h2 style="margin: 0;">Meu Perfil</h2>
-                    </div>
-                    <div class="profile-form">
-                        <div class="profile-avatar">
-                            <div class="profile-avatar-initials">
-                                {{ nome[0] if nome else 'U' }}
-                            </div>
-                            <button class="btn-edit-avatar" type="button" title="Alterar foto">
-                                <i class="fas fa-camera"></i>
-                            </button>
-                        </div>
-                        <form onsubmit="salvarPerfil(event)">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label class="form-label">Nome Completo</label>
-                                    <input type="text" 
-                                           name="name" 
-                                           id="profile-name"
-                                           class="form-control" 
-                                           value="{{ nome }}"
-                                           autocomplete="name">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">E-mail</label>
-                                    <input type="email" 
-                                           name="email" 
-                                           id="profile-email"
-                                           class="form-control" 
-                                           value="{{ session.get('usuario_email', '') }}"
-                                           autocomplete="email">
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label class="form-label">Telefone</label>
-                                    <input type="tel" 
-                                           name="phone" 
-                                           id="profile-phone" 
-                                           class="form-control" 
-                                           placeholder="(11) 99999-9999"
-                                           autocomplete="tel">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Endereço</label>
-                                    <input type="text" 
-                                           name="address" 
-                                           id="profile-address" 
-                                           class="form-control" 
-                                           placeholder="Rua, número, bairro"
-                                           autocomplete="street-address">
-                                </div>
-                            </div>
-                            <button type="submit" class="btn btn--primary">
-                                <i class="fas fa-save"></i> Salvar Alterações
-                            </button>
-                        </form>
-                    </div>
-                </div>
+
 
             </main>
         </div>

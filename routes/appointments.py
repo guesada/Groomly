@@ -11,16 +11,12 @@ appointments_bp = Blueprint("appointments", __name__, url_prefix="/api/appointme
 def validate_datetime(date_str, time_str):
     """Valida data e horário."""
     try:
-        apt_date = datetime.strptime(date_str, "%Y-%m-%d").date()
-        today = datetime.now().date()
+        apt_datetime = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M")
+        now = datetime.now()
         
-        if apt_date < today:
-            return "Não é possível agendar em datas passadas"
-        
-        if apt_date == today:
-            apt_time = datetime.strptime(time_str, "%H:%M").time()
-            if apt_time <= datetime.now().time():
-                return "Não é possível agendar em horários que já passaram"
+        # Apenas bloquear horários que já passaram
+        if apt_datetime <= now:
+            return "Não é possível agendar em horários passados"
         
         return None
     except ValueError:
@@ -95,3 +91,19 @@ def appointments_for_barber(barber_id: int):
     
     data = list_appointments_for_barber(barber_id, request.args.get('date'))
     return jsonify({"success": True, "data": data})
+
+
+@appointments_bp.post('/auto-complete')
+def auto_complete():
+    """Endpoint para executar manualmente a conclusão automática de agendamentos passados."""
+    if not exigir_login("barbeiro"):
+        return jsonify({"success": False, "message": "Apenas barbeiros podem executar esta ação"}), 401
+    
+    from services import auto_complete_past_appointments
+    updated_count = auto_complete_past_appointments()
+    
+    return jsonify({
+        "success": True, 
+        "message": f"{updated_count} agendamento(s) marcado(s) como concluído(s)",
+        "updated_count": updated_count
+    })

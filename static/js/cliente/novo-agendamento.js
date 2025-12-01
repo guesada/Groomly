@@ -287,6 +287,8 @@ async function selectDate(dateStr) {
   
   if (date < today) return;
   
+  // Limpar horário selecionado ao mudar de data
+  bookingState.time = null;
   bookingState.date = dateStr;
   renderCalendar();
   await loadAvailableTimes();
@@ -590,7 +592,17 @@ function prevMonth() {
     bookingState.currentYear--;
   }
   
+  // Limpar seleção de data e horário ao mudar de mês
+  bookingState.date = null;
+  bookingState.time = null;
+  
   renderCalendar();
+  
+  // Limpar horários exibidos
+  const container = document.getElementById('time-slots-new');
+  if (container) container.innerHTML = '';
+  
+  updateNextButton();
 }
 
 function nextMonth() {
@@ -601,7 +613,17 @@ function nextMonth() {
     bookingState.currentYear++;
   }
   
+  // Limpar seleção de data e horário ao mudar de mês
+  bookingState.date = null;
+  bookingState.time = null;
+  
   renderCalendar();
+  
+  // Limpar horários exibidos
+  const container = document.getElementById('time-slots-new');
+  if (container) container.innerHTML = '';
+  
+  updateNextButton();
 }
 
 // Exportar funções

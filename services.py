@@ -19,17 +19,31 @@ from db import db, Cliente, Barber, Service, Appointment, Report, DEFAULT_HORARI
 def init_app(app):
     # Configura o SQLALCHEMY_DATABASE_URI
     # Formato: mysql+pymysql://usuario:senha@host:porta/database
+    from urllib.parse import unquote, quote_plus
+    
     database_url = os.environ.get("DATABASE_URL")
     
     if database_url:
-        # Se DATABASE_URL estiver no formato: root@localhost:3306@senha
-        # Converter para: mysql+pymysql://root:senha@localhost:3306/cortedigital
+        # Se DATABASE_URL estiver no formato: root@localhost:3306@senha@database
+        # Converter para: mysql+pymysql://root:senha@localhost:3306/database
         parts = database_url.split('@')
-        if len(parts) == 3:
+        if len(parts) >= 4:
             user = parts[0]
             host_port = parts[1]
-            password = parts[2]
-            database_url = f"mysql+pymysql://{user}:{password}@{host_port}/cortedigital"
+            # A senha pode conter @ codificado, então pegar tudo entre host_port e database
+            password_raw = parts[2]
+            database = parts[3]
+            # Decodificar URL encoding (ex: %40 -> @) e depois codificar para SQLAlchemy
+            password = unquote(password_raw)
+            password_encoded = quote_plus(password)
+            database_url = f"mysql+pymysql://{user}:{password_encoded}@{host_port}/{database}"
+        else:
+            # Formato antigo (compatibilidade)
+            user = parts[0]
+            host_port = parts[1]
+            password = unquote(parts[2])
+            password_encoded = quote_plus(password)
+            database_url = f"mysql+pymysql://{user}:{password_encoded}@{host_port}/cortedigital"
     else:
         # Fallback para banco local
         database_url = "mysql+pymysql://root:pjn%402024@localhost:3306/cortedigital"
@@ -199,7 +213,7 @@ def create_appointment(body: Dict[str, Any]) -> Dict[str, Any]:
         servico_id=int(body["serviceId"]),
         date=body["date"],
         time=body["time"],
-        status="agendado",
+        status="pendente",
         total_price=float(body.get("total", 0)),
         created_at=datetime.utcnow().isoformat(),
     )
@@ -225,6 +239,54 @@ def update_appointment_status(appointment_id: str, status: str) -> bool:
     ap.status = status
     db.session.commit()
     return True
+
+
+def auto_complete_past_appointments() -> int:
+    """
+    Marca automaticamente como 'concluído' todos os agendamentos
+    cujo horário já passou + duração do serviço.
+    
+    Calcula: horário_inicio + duração_serviço = horário_fim
+    Se horário_fim < agora, marca como concluído.
+    
+    Retorna o número de agendamentos atualizados.
+    """
+    from datetime import timedelta
+    
+    now = datetime.now()
+    
+    # Buscar todos os agendamentos com status 'agendado' ou 'pendente'
+    appointments = Appointment.query.filter(
+        Appointment.status.in_(['agendado', 'pendente'])
+    ).all()
+    
+    updated_count = 0
+    for apt in appointments:
+        try:
+            # Combinar data e hora do agendamento (formato: YYYY-MM-DD HH:MM)
+            apt_datetime = datetime.strptime(f"{apt.date} {apt.time}", "%Y-%m-%d %H:%M")
+            
+            # Buscar a duração do serviço
+            servico = Service.query.get(apt.servico_id)
+            duracao_minutos = servico.duracao if servico and servico.duracao else 60  # Default: 60 minutos
+            
+            # Calcular horário de término do serviço
+            apt_end_datetime = apt_datetime + timedelta(minutes=duracao_minutos)
+            
+            # Comparar: se o horário de término já passou, marcar como concluído
+            if apt_end_datetime < now:
+                apt.status = "concluído"
+                updated_count += 1
+        except (ValueError, TypeError) as e:
+            # Ignorar agendamentos com data/hora inválida
+            print(f"Erro ao processar agendamento {apt.id}: {e}")
+            continue
+    
+    # Salvar todas as alterações de uma vez
+    if updated_count > 0:
+        db.session.commit()
+    
+    return updated_count
 
 
 def dados_iniciais() -> Dict[str, Any]:

@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/barbeiro/agenda-inteligente.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/barbeiro/precos.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/barbeiro/barbeiro-professional.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/light-theme.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="dark-theme">
@@ -50,9 +51,6 @@
 
                 <!-- Actions -->
                 <div class="barber-header-actions">
-                    <button class="action-btn" onclick="toggleTheme()" title="Alternar Tema">
-                        <i class="fas fa-moon" id="theme-icon"></i>
-                    </button>
                     <div class="user-menu">
                         <button class="user-menu-btn" onclick="toggleUserMenu()">
                             <div class="user-avatar">{{ nome[0] if nome else 'B' }}</div>

@@ -29,7 +29,8 @@ async function fazerLogin(e, destino) {
     if (data.success) {
       const userType = data.user?.userType || destino;
       console.log('✅ Login bem-sucedido! Redirecionando para:', userType);
-      window.location.href = userType === 'barbeiro' ? '/barbeiro' : '/cliente';
+      // Usar replace para evitar parâmetros na URL e limpar histórico
+      window.location.replace(userType === 'barbeiro' ? '/barbeiro' : '/cliente');
     } else {
       console.error('❌ Login falhou:', data.message);
       if (typeof showNotificationToast === 'function') {
@@ -78,9 +79,22 @@ async function fazerCadastro(e, tipo) {
       if (typeof showNotificationToast === 'function') {
         showNotificationToast('Cadastro realizado com sucesso!', 'success');
       }
-      setTimeout(() => {
-        window.location.href = tipo === 'barbeiro' ? '/barbeiro' : '/cliente';
-      }, 1000);
+      // Fazer login automático após cadastro
+      const loginResponse = await fetch(`${API_BASE}/users/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email, password })
+      });
+      
+      const loginData = await loginResponse.json();
+      if (loginData.success) {
+        // Usar replace para evitar parâmetros na URL
+        window.location.replace(tipo === 'barbeiro' ? '/barbeiro' : '/cliente');
+      } else {
+        // Se login falhar, redirecionar para tela de login
+        window.location.replace('/');
+      }
     } else {
       if (typeof showNotificationToast === 'function') {
         showNotificationToast(data.message || 'Erro ao cadastrar', 'error');
@@ -104,10 +118,10 @@ async function logout() {
       method: 'POST',
       credentials: 'include'
     });
-    window.location.href = '/';
+    window.location.replace('/');
   } catch (error) {
     console.error('Logout error:', error);
-    window.location.href = '/';
+    window.location.replace('/');
   }
 }
 

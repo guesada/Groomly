@@ -20,6 +20,16 @@ services.init_app(app)
 register_routes(app)
 
 
+@app.before_request
+def auto_complete_appointments():
+    """Middleware que verifica e completa agendamentos expirados antes de cada requisição."""
+    try:
+        services.auto_complete_past_appointments()
+    except Exception as e:
+        # Não bloquear a requisição se houver erro na verificação
+        print(f"Erro ao auto-completar agendamentos: {e}")
+
+
 @app.errorhandler(404)
 def handler_404(_):
     return jsonify({"success": False, "message": "Rota não encontrada"}), 404

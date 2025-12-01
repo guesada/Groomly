@@ -99,10 +99,11 @@ async function loadProfessionalMetrics() {
         console.log('⏳ Pendentes hoje:', pendingToday.length);
         console.log('📅 Próximos 7 dias:', upcomingAppointments.length);
         
-        // Faturamento últimos 7 dias
+        // Faturamento últimos 7 dias (incluindo agendados e pendentes)
         const last7Days = appointments.filter(a => {
             const date = new Date(a.data + 'T00:00:00');
-            return date >= sevenDaysAgo && a.status === 'concluido';
+            // Incluir concluídos, agendados e pendentes dos últimos 7 dias
+            return date >= sevenDaysAgo && ['concluido', 'concluído', 'agendado', 'pendente', 'confirmado'].includes(a.status);
         });
         const revenue7Days = last7Days.reduce((sum, a) => sum + (parseFloat(a.preco) || 0), 0);
         
@@ -306,17 +307,17 @@ function renderWeeklyChart(appointments) {
         
         // Contar agendamentos concluídos
         const completed = appointments.filter(a => 
-            a.data === dateStr && a.status === 'concluido'
+            a.data === dateStr && (a.status === 'concluido' || a.status === 'concluído')
         ).length;
         
-        // Contar todos os agendamentos (incluindo pendentes)
+        // Contar todos os agendamentos (incluindo pendentes e futuros)
         const total = appointments.filter(a => 
-            a.data === dateStr && ['agendado', 'confirmado', 'concluido'].includes(a.status)
+            a.data === dateStr && ['agendado', 'confirmado', 'concluido', 'concluído', 'pendente'].includes(a.status)
         ).length;
         
-        // Calcular faturamento
+        // Calcular faturamento (incluindo agendados e pendentes para projeção)
         const revenue = appointments
-            .filter(a => a.data === dateStr && a.status === 'concluido')
+            .filter(a => a.data === dateStr && ['concluido', 'concluído', 'agendado', 'pendente', 'confirmado'].includes(a.status))
             .reduce((sum, a) => sum + (parseFloat(a.preco) || 0), 0);
         
         const isToday = i === 0;
@@ -489,6 +490,13 @@ function renderAgendaDigital() {
     if (agendaState.currentFilter !== 'todos') {
         if (agendaState.currentFilter === 'pendente') {
             filtered = filtered.filter(a => ['agendado', 'pendente'].includes(a.status));
+        } else if (agendaState.currentFilter === 'concluido') {
+            // Aceitar ambas variações: com e sem acento
+            filtered = filtered.filter(a => a.status === 'concluido' || a.status === 'concluído');
+        } else if (agendaState.currentFilter === 'confirmado') {
+            filtered = filtered.filter(a => a.status === 'confirmado');
+        } else if (agendaState.currentFilter === 'cancelado') {
+            filtered = filtered.filter(a => a.status === 'cancelado');
         } else {
             filtered = filtered.filter(a => a.status === agendaState.currentFilter);
         }
@@ -573,7 +581,8 @@ function renderAppointmentCardModern(apt) {
     // Lógica inteligente de ações
     const canConfirm = (aptStatus === 'agendado' || aptStatus === 'pendente') && !hasPassed;
     const canComplete = (aptStatus === 'confirmado' || aptStatus === 'agendado') && hasPassed;
-    const canCancel = !isCanceled && !isCompleted;
+    // Barbeiro só pode cancelar agendamentos futuros
+    const canCancel = !isCanceled && !isCompleted && !hasPassed;
     
     return `
         <div class="appointment-card-modern status-${aptStatus} ${hasPassed ? 'past-appointment' : ''}">
