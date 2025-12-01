@@ -94,4 +94,4 @@ if __name__ == "__main__":
     # host: 127.0.0.1 (localhost) - apenas conexões locais
     # port: 5001 - porta do servidor
     # debug: True - ativa modo debug com reload automático e mensagens detalhadas
-    socketio.run(app, host="127.0.0.1", port=5001, debug=True, allow_unsafe_werkzeug=True)
+    socketio.run(app, host="127.0.0.1", port=5001, debug=True)
