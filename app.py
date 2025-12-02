@@ -1,3 +1,7 @@
+# Desabilita criação de __pycache__
+import sys
+sys.dont_write_bytecode = True
+
 # Importações necessárias do Flask e extensões
 from flask import Flask, jsonify
 from flask_cors import CORS
@@ -100,14 +104,30 @@ def handler_exception(erro):
 
 if __name__ == "__main__":
     import os
+    from pathlib import Path
+    import shutil
+    
+    # Limpa __pycache__ ao iniciar
+    print("🧹 Limpando cache...")
+    for pycache in Path('.').rglob('__pycache__'):
+        try:
+            shutil.rmtree(pycache)
+        except:
+            pass
+    
     # Inicia o servidor Flask com SocketIO
     # Em produção, usa a porta do ambiente. Em desenvolvimento, usa 5001
     port = int(os.environ.get("PORT", 5001))
     host = os.environ.get("HOST", "127.0.0.1")
     debug = os.environ.get("DEBUG", "True") == "True"
     
-    print(f"🚀 Iniciando servidor em {host}:{port}")
-    print(f"🔧 Modo: {'Produção' if os.environ.get('RENDER') else 'Desenvolvimento'}")
-    print(f"🔌 Async mode: {async_mode}")
+    print("=" * 60)
+    print("  🚀 CORTE DIGITAL - Servidor Iniciando")
+    print("=" * 60)
+    print(f"  📍 Endereço: http://{host}:{port}")
+    print(f"  🔧 Modo: {'Produção' if os.environ.get('RENDER') else 'Desenvolvimento'}")
+    print(f"  🔌 Async mode: {async_mode}")
+    print("=" * 60)
+    print()
     
     socketio.run(app, host=host, port=port, debug=debug, allow_unsafe_werkzeug=True)
