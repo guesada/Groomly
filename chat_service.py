@@ -88,6 +88,12 @@ def get_or_create_conversation(cliente_id, barbeiro_id):
 
 def send_message(conversation_id, sender_id, sender_type, message):
     """Envia uma mensagem no chat"""
+    print(f"💾 chat_service.send_message chamado:")
+    print(f"   conversation_id={conversation_id}")
+    print(f"   sender_id={sender_id}")
+    print(f"   sender_type={sender_type}")
+    print(f"   message={message}")
+    
     conn = get_database_connection()
     cursor = conn.cursor()
     
@@ -97,6 +103,8 @@ def send_message(conversation_id, sender_id, sender_type, message):
             INSERT INTO chat_messages (conversation_id, sender_id, sender_type, message)
             VALUES (%s, %s, %s, %s)
         """, (conversation_id, sender_id, sender_type, message))
+        
+        print(f"✅ Mensagem inserida no banco, ID: {cursor.lastrowid}")
         
         message_id = cursor.lastrowid
         
@@ -142,7 +150,17 @@ def send_message(conversation_id, sender_id, sender_type, message):
                 WHERE m.id = %s
             """, (message_id,))
         
-        return cursor.fetchone()
+        result = cursor.fetchone()
+        
+        # Converte datetime para string
+        if result and result.get('created_at'):
+            result['created_at'] = result['created_at'].isoformat()
+        
+        return result
+        
+    finally:
+        cursor.close()
+        conn.close()
         
     finally:
         cursor.close()
