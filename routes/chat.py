@@ -3,7 +3,7 @@ Rotas do sistema de chat
 """
 from flask import Blueprint, request, jsonify, session
 from flask_socketio import emit, join_room, leave_room
-import chat_service
+from services import chat_service
 
 chat_bp = Blueprint('chat', __name__)
 
