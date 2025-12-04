@@ -1,4 +1,4 @@
-// ===== NOVO SISTEMA DE AGENDAMENTO =====
+// ===== SISTEMA PROFISSIONAL DE AGENDAMENTO =====
 
 let bookingState = {
   currentStep: 1,
@@ -12,127 +12,265 @@ let bookingState = {
   currentYear: new Date().getFullYear()
 };
 
-// Inicializar sistema de agendamento
+// ===== INICIALIZAÇÃO =====
 async function initNovoAgendamento() {
-  console.log('🚀 Inicializando novo sistema de agendamento');
+  console.log('🚀 Inicializando sistema de agendamento profissional');
   
-  // Resetar mês/ano para o atual
   const today = new Date();
   bookingState.currentMonth = today.getMonth();
   bookingState.currentYear = today.getFullYear();
   
-  // Carregar dados
-  await loadBarbersData(); // Carregar barbeiros primeiro
-  await loadServicesData(); // Serviços depois
+  await Promise.all([loadBarbersData(), loadServicesData()]);
   
-  // Renderizar primeira etapa (barbeiros)
   renderStep(1);
   updateProgress();
 }
 
-// Carregar serviços
+// ===== CARREGAMENTO DE DADOS =====
 async function loadServicesData() {
   try {
-    // Adicionar timestamp para evitar cache
     const timestamp = new Date().getTime();
     const res = await fetch(`/api/services?_=${timestamp}`, { 
       credentials: 'include',
       cache: 'no-cache'
     });
-    if (!res.ok) return;
+    
+    if (!res.ok) throw new Error('Erro ao carregar serviços');
+    
     const data = await res.json();
     bookingState.services = data.data || [];
-    console.log('📦 Serviços carregados:', bookingState.services);
-    renderServices();
+    console.log('✅ Serviços carregados:', bookingState.services.length);
   } catch (error) {
-    console.error('Erro ao carregar serviços:', error);
+    console.error('❌ Erro ao carregar serviços:', error);
+    showNotificationToast('Erro ao carregar serviços', 'error');
   }
 }
 
-// Carregar barbeiros
 async function loadBarbersData() {
   try {
     const res = await fetch('/api/barbers', { credentials: 'include' });
-    if (!res.ok) return;
+    
+    if (!res.ok) throw new Error('Erro ao carregar barbeiros');
+    
     const data = await res.json();
     bookingState.barbers = data.data || [];
+    console.log('✅ Barbeiros carregados:', bookingState.barbers.length);
   } catch (error) {
-    console.error('Erro ao carregar barbeiros:', error);
+    console.error('❌ Erro ao carregar barbeiros:', error);
+    showNotificationToast('Erro ao carregar barbeiros', 'error');
   }
 }
 
-// Renderizar serviços
+async function loadBarberPrices(barberId) {
+  try {
+    const response = await fetch(`/api/barber-prices?barbeiro_id=${barberId}`);
+    const result = await response.json();
+    
+    if (result.success && result.data) {
+      bookingState.services.forEach(service => {
+        const customPrice = result.data[service.nome];
+        if (customPrice !== undefined) {
+          service.preco = customPrice;
+        }
+      });
+      
+      if (bookingState.currentStep === 2) {
+        renderServices();
+      }
+    }
+  } catch (error) {
+    console.error('❌ Erro ao carregar preços:', error);
+  }
+}
+
+// ===== RENDERIZAÇÃO DE BARBEIROS =====
+function renderBarbers() {
+  const container = document.getElementById('barbers-grid-new');
+  if (!container) return;
+  
+  if (bookingState.barbers.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i class="fas fa-user-tie"></i>
+        </div>
+        <h3>Nenhum barbeiro disponível</h3>
+        <p>Entre em contato para mais informações</p>
+      </div>
+    `;
+    return;
+  }
+  
+  container.innerHTML = bookingState.barbers.map(barber => {
+    const isSelected = bookingState.barber?.id === barber.id;
+    const initial = (barber.nome || 'B')[0].toUpperCase();
+    const colors = ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b', '#fa709a'];
+    const color = colors[barber.id % colors.length];
+    
+    return `
+      <div class="barber-card-pro ${isSelected ? 'selected' : ''}" 
+           onclick="selectBarber(${barber.id})"
+           data-aos="fade-up"
+           data-aos-delay="${barber.id * 50}">
+        
+        <div class="barber-check">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        
+        <div class="barber-avatar" style="background: linear-gradient(135deg, ${color}, ${color}dd);">
+          <span>${initial}</span>
+          <div class="avatar-ring"></div>
+        </div>
+        
+        <div class="barber-info">
+          <h3 class="barber-name">${barber.nome || 'Barbeiro'}</h3>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function selectBarber(barberId) {
+  const barber = bookingState.barbers.find(b => b.id === barberId);
+  if (!barber) return;
+  
+  bookingState.barber = barber;
+  renderBarbers();
+  await loadBarberPrices(barberId);
+  updateNextButton();
+}
+
+// ===== RENDERIZAÇÃO DE SERVIÇOS =====
 function renderServices() {
   const container = document.getElementById('services-grid-new');
   if (!container) return;
   
   if (bookingState.services.length === 0) {
     container.innerHTML = `
-      <div class="empty-state-services">
-        <div class="empty-state-icon">
+      <div class="empty-state">
+        <div class="empty-icon">
           <i class="fas fa-cut"></i>
         </div>
-        <div class="empty-state-title">Nenhum serviço disponível</div>
-        <div class="empty-state-text">Entre em contato para mais informações</div>
+        <h3>Nenhum serviço disponível</h3>
+        <p>Entre em contato com a barbearia</p>
       </div>
     `;
     return;
   }
   
-  // Ícones específicos para cada serviço
-  const serviceIcons = {
-    'Corte': 'fa-cut',
-    'Barba': 'fa-user-tie',
-    'Corte + Barba': 'fa-scissors'
+  const serviceConfig = {
+    'Corte': {
+      icon: 'fa-cut',
+      gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      features: ['Lavagem incluída', 'Finalização profissional', 'Produtos premium'],
+      badge: null
+    },
+    'Barba': {
+      icon: 'fa-user-tie',
+      gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+      features: ['Toalha quente', 'Navalha profissional', 'Hidratação'],
+      badge: null
+    },
+    'Corte + Barba': {
+      icon: 'fa-scissors',
+      gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+      features: ['Combo completo', 'Melhor custo-benefício', 'Atendimento premium'],
+      badge: { text: 'Mais Popular', class: 'popular' }
+    },
+    'Sobrancelha': {
+      icon: 'fa-eye',
+      gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+      features: ['Design personalizado', 'Técnica profissional', 'Resultado natural'],
+      badge: null
+    },
+    'Pigmentação': {
+      icon: 'fa-paint-brush',
+      gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+      features: ['Pigmentação premium', 'Resultado duradouro', 'Produtos importados'],
+      badge: { text: 'Premium', class: 'premium' }
+    },
+    'Hidratação': {
+      icon: 'fa-tint',
+      gradient: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
+      features: ['Tratamento profundo', 'Produtos premium', 'Cabelos saudáveis'],
+      badge: null
+    }
   };
   
   container.innerHTML = bookingState.services.map((service, index) => {
     const isSelected = bookingState.service?.id === service.id;
-    const icon = serviceIcons[service.nome] || 'fa-cut';
-    const animationDelay = index * 0.1;
+    const config = serviceConfig[service.nome] || {
+      icon: 'fa-cut',
+      gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      features: [],
+      badge: null
+    };
     
     return `
-      <div class="service-card-modern ${isSelected ? 'selected' : ''}" 
+      <div class="service-card-pro ${isSelected ? 'selected' : ''}" 
            onclick="selectService(${service.id})"
-           style="animation-delay: ${animationDelay}s">
+           data-aos="fade-up"
+           data-aos-delay="${index * 50}">
         
-        <!-- Badge de seleção -->
-        <div class="service-selection-badge">
+        ${config.badge ? `
+          <div class="service-badge-pro ${config.badge.class}">
+            <i class="fas fa-crown"></i>
+            ${config.badge.text}
+          </div>
+        ` : ''}
+        
+        <div class="service-check">
           <i class="fas fa-check-circle"></i>
         </div>
         
-        <!-- Ícone do serviço -->
-        <div class="service-icon-modern">
-          <div class="service-icon-bg"></div>
-          <i class="fas ${icon}"></i>
+        <div class="service-icon-pro" style="background: ${config.gradient};">
+          <i class="fas ${config.icon}"></i>
+          <div class="icon-glow"></div>
         </div>
         
-        <!-- Informações do serviço -->
-        <div class="service-info-modern">
-          <h4 class="service-title-modern">${service.nome || 'Serviço'}</h4>
-          <p class="service-desc-modern">${service.descricao || 'Serviço profissional de barbearia'}</p>
+        <div class="service-content">
+          <h3 class="service-title-pro">${service.nome}</h3>
+          <p class="service-desc-pro">${service.descricao || getServiceDescription(service.nome)}</p>
+          
+          ${config.features.length > 0 ? `
+            <div class="service-features-pro">
+              ${config.features.map(f => `
+                <div class="feature-item">
+                  <i class="fas fa-check"></i>
+                  <span>${f}</span>
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
         </div>
         
-        <!-- Detalhes (preço e duração) -->
-        <div class="service-footer-modern">
-          <div class="service-price-modern">
-            <span class="price-label">A partir de</span>
-            <span class="price-value">R$ ${parseFloat(service.preco || 0).toFixed(2).replace('.', ',')}</span>
-          </div>
-          <div class="service-duration-modern">
+        <div class="service-footer-pro">
+          <div class="service-duration-pro">
             <i class="fas fa-clock"></i>
-            <span>${service.duracao || '30'} min</span>
+            <span>${service.duracao || 30} min</span>
+          </div>
+          <div class="service-price-pro">
+            <span class="price-label">A partir de</span>
+            <span class="price-value">R$ ${parseFloat(service.preco).toFixed(2)}</span>
           </div>
         </div>
-        
-        <!-- Efeito hover -->
-        <div class="service-hover-effect"></div>
       </div>
     `;
   }).join('');
 }
 
-// Selecionar serviço
+function getServiceDescription(nome) {
+  const descriptions = {
+    'Corte': 'Corte de cabelo profissional com técnicas modernas e acabamento impecável.',
+    'Barba': 'Barba feita com navalha, toalha quente e produtos de alta qualidade.',
+    'Corte + Barba': 'Combo completo com corte de cabelo e barba, o melhor custo-benefício.',
+    'Sobrancelha': 'Design de sobrancelha masculina para um visual mais marcante.',
+    'Pigmentação': 'Pigmentação de barba ou cabelo para um visual mais jovem.',
+    'Hidratação': 'Tratamento de hidratação profunda para cabelos saudáveis.'
+  };
+  return descriptions[nome] || 'Serviço profissional de alta qualidade.';
+}
+
 function selectService(serviceId) {
   const service = bookingState.services.find(s => s.id === serviceId);
   if (!service) return;
@@ -142,88 +280,7 @@ function selectService(serviceId) {
   updateNextButton();
 }
 
-// Renderizar barbeiros
-function renderBarbers() {
-  const container = document.getElementById('barbers-grid-new');
-  if (!container) return;
-  
-  if (bookingState.barbers.length === 0) {
-    container.innerHTML = `
-      <div style="grid-column: 1/-1; text-align: center; padding: 3rem;">
-        <i class="fas fa-user-tie" style="font-size: 3rem; color: #6366f1; opacity: 0.3; margin-bottom: 1rem;"></i>
-        <p style="color: var(--color-text-secondary);">Nenhum barbeiro disponível no momento.</p>
-      </div>
-    `;
-    return;
-  }
-  
-  container.innerHTML = bookingState.barbers.map(barber => {
-    const initial = (barber.nome || 'B')[0].toUpperCase();
-    return `
-      <div class="barber-card ${bookingState.barber?.id === barber.id ? 'selected' : ''}" 
-           onclick="selectBarber(${barber.id})">
-        <div class="barber-check">
-          <i class="fas fa-check"></i>
-        </div>
-        <div class="barber-avatar">${initial}</div>
-        <div class="barber-name">${barber.nome || 'Barbeiro'}</div>
-        <div class="barber-rating">
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-        </div>
-        <div class="barber-specialty">Especialista</div>
-      </div>
-    `;
-  }).join('');
-}
-
-// Selecionar barbeiro
-async function selectBarber(barberId) {
-  const barber = bookingState.barbers.find(b => b.id === barberId);
-  if (!barber) return;
-  
-  bookingState.barber = barber;
-  renderBarbers();
-  
-  // Carregar preços personalizados do barbeiro
-  console.log('💰 Carregando preços do barbeiro:', barberId);
-  await loadBarberPrices(barberId);
-  
-  updateNextButton();
-}
-
-// Carregar preços personalizados do barbeiro
-async function loadBarberPrices(barberId) {
-  try {
-    const response = await fetch(`/api/barber-prices?barbeiro_id=${barberId}`);
-    const result = await response.json();
-    
-    if (result.success && result.data) {
-      console.log('💰 Preços recebidos:', result.data);
-      
-      // Atualizar preços dos serviços
-      bookingState.services.forEach(service => {
-        const customPrice = result.data[service.nome];
-        if (customPrice !== undefined) {
-          service.preco = customPrice;
-          console.log(`✅ Preço atualizado: ${service.nome} = R$ ${customPrice}`);
-        }
-      });
-      
-      // Re-renderizar serviços se já estiver na etapa de serviços
-      if (bookingState.currentStep === 2) {
-        renderServices();
-      }
-    }
-  } catch (error) {
-    console.error('❌ Erro ao carregar preços do barbeiro:', error);
-  }
-}
-
-// Renderizar calendário
+// ===== RENDERIZAÇÃO DE CALENDÁRIO =====
 function renderCalendar() {
   const container = document.getElementById('calendar-grid-new');
   if (!container) return;
@@ -232,7 +289,6 @@ function renderCalendar() {
   const currentMonth = bookingState.currentMonth;
   const currentYear = bookingState.currentYear;
   
-  // Atualizar título
   const titleEl = document.getElementById('calendar-title-new');
   if (titleEl) {
     const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
@@ -240,19 +296,15 @@ function renderCalendar() {
     titleEl.textContent = `${monthNames[currentMonth]} ${currentYear}`;
   }
   
-  // Dias da semana
   const dayLabels = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
   let html = dayLabels.map(day => `<div class="calendar-day-label">${day}</div>`).join('');
   
-  // Primeiro dia do mês
   const firstDay = new Date(currentYear, currentMonth, 1).getDay();
   
-  // Dias vazios
   for (let i = 0; i < firstDay; i++) {
-    html += '<div></div>';
+    html += '<div class="calendar-day-empty"></div>';
   }
   
-  // Dias do mês
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
   const todayDate = new Date();
   todayDate.setHours(0, 0, 0, 0);
@@ -265,21 +317,27 @@ function renderCalendar() {
                     currentYear === today.getFullYear();
     const isPast = date < todayDate;
     const isSelected = bookingState.date === dateStr;
+    const isWeekend = date.getDay() === 0 || date.getDay() === 6;
     
     const classes = [
-      'calendar-day',
+      'calendar-day-pro',
       isToday ? 'today' : '',
       isPast ? 'disabled' : '',
-      isSelected ? 'selected' : ''
+      isSelected ? 'selected' : '',
+      isWeekend ? 'weekend' : ''
     ].filter(Boolean).join(' ');
     
-    html += `<div class="${classes}" onclick="selectDate('${dateStr}')">${day}</div>`;
+    html += `
+      <div class="${classes}" onclick="selectDate('${dateStr}')">
+        <span class="day-number">${day}</span>
+        ${isToday ? '<span class="day-indicator">Hoje</span>' : ''}
+      </div>
+    `;
   }
   
   container.innerHTML = html;
 }
 
-// Selecionar data
 async function selectDate(dateStr) {
   const date = new Date(dateStr + 'T00:00:00');
   const today = new Date();
@@ -287,7 +345,6 @@ async function selectDate(dateStr) {
   
   if (date < today) return;
   
-  // Limpar horário selecionado ao mudar de data
   bookingState.time = null;
   bookingState.date = dateStr;
   renderCalendar();
@@ -295,7 +352,7 @@ async function selectDate(dateStr) {
   updateNextButton();
 }
 
-// Carregar horários disponíveis
+// ===== RENDERIZAÇÃO DE HORÁRIOS =====
 async function loadAvailableTimes() {
   const container = document.getElementById('time-slots-new');
   if (!container) return;
@@ -305,8 +362,9 @@ async function loadAvailableTimes() {
     return;
   }
   
+  container.innerHTML = '<div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Carregando horários...</div>';
+  
   try {
-    // Buscar horários ocupados
     const res = await fetch(`/api/appointments/for_barber/${bookingState.barber.id}?date=${bookingState.date}`, {
       credentials: 'include'
     });
@@ -319,19 +377,17 @@ async function loadAvailableTimes() {
         .map(a => a.time);
     }
     
-    // Horários disponíveis (8h às 18h)
     const times = [];
     for (let hour = 8; hour < 18; hour++) {
       times.push(`${hour.toString().padStart(2, '0')}:00`);
       times.push(`${hour.toString().padStart(2, '0')}:30`);
     }
     
-    // Verificar se é hoje
     const selectedDate = new Date(bookingState.date + 'T00:00:00');
     const today = new Date();
     const isToday = selectedDate.toDateString() === today.toDateString();
     
-    container.innerHTML = times.map(time => {
+    container.innerHTML = times.map((time, index) => {
       const isOccupied = occupied.includes(time);
       let isPast = false;
       
@@ -346,34 +402,35 @@ async function loadAvailableTimes() {
       const isSelected = bookingState.time === time;
       
       const classes = [
-        'time-slot',
+        'time-slot-pro',
         isDisabled ? 'disabled' : '',
         isSelected ? 'selected' : ''
       ].filter(Boolean).join(' ');
       
-      let statusText = '';
-      if (isOccupied) {
-        statusText = '<div class="time-slot-status occupied">Ocupado</div>';
-      } else if (isPast) {
-        statusText = '<div class="time-slot-status past">Passou</div>';
-      }
-      
       return `
-        <div class="${classes}" onclick="selectTime('${time}')">
-          <div class="time-slot-time">${time}</div>
-          ${statusText}
+        <div class="${classes}" 
+             onclick="selectTime('${time}')"
+             data-aos="fade-up"
+             data-aos-delay="${index * 20}">
+          <div class="time-icon">
+            <i class="fas ${isOccupied ? 'fa-lock' : isPast ? 'fa-clock' : 'fa-check'}"></i>
+          </div>
+          <div class="time-value">${time}</div>
+          ${isDisabled ? `
+            <div class="time-status">${isOccupied ? 'Ocupado' : 'Indisponível'}</div>
+          ` : ''}
         </div>
       `;
     }).join('');
     
   } catch (error) {
     console.error('Erro ao carregar horários:', error);
+    container.innerHTML = '<div class="error-message"><i class="fas fa-exclamation-circle"></i> Erro ao carregar horários</div>';
   }
 }
 
-// Selecionar horário
 function selectTime(time) {
-  const timeSlot = event.target.closest('.time-slot');
+  const timeSlot = event.target.closest('.time-slot-pro');
   if (timeSlot && timeSlot.classList.contains('disabled')) return;
   
   bookingState.time = time;
@@ -381,77 +438,119 @@ function selectTime(time) {
   updateNextButton();
 }
 
-// Renderizar resumo
+// ===== RENDERIZAÇÃO DE RESUMO =====
 function renderSummary() {
   const container = document.getElementById('booking-summary-new');
   if (!container) return;
   
   const dateObj = new Date(bookingState.date + 'T00:00:00');
   const dateFormatted = dateObj.toLocaleDateString('pt-BR', { 
+    weekday: 'long',
     day: '2-digit', 
     month: 'long', 
     year: 'numeric' 
   });
   
+  const barberInitial = (bookingState.barber?.nome || 'B')[0].toUpperCase();
+  
   container.innerHTML = `
-    <div class="summary-title">
-      <i class="fas fa-clipboard-check"></i>
-      Resumo do Agendamento
-    </div>
-    <div class="summary-item">
-      <div class="summary-label">Serviço</div>
-      <div class="summary-value">${bookingState.service?.nome || '-'}</div>
-    </div>
-    <div class="summary-item">
-      <div class="summary-label">Barbeiro</div>
-      <div class="summary-value">${bookingState.barber?.nome || '-'}</div>
-    </div>
-    <div class="summary-item">
-      <div class="summary-label">Data</div>
-      <div class="summary-value">${dateFormatted}</div>
-    </div>
-    <div class="summary-item">
-      <div class="summary-label">Horário</div>
-      <div class="summary-value">${bookingState.time || '-'}</div>
-    </div>
-    <div class="summary-item summary-total">
-      <div class="summary-label">Total</div>
-      <div class="summary-value">R$ ${parseFloat(bookingState.service?.preco || 0).toFixed(2)}</div>
+    <div class="summary-card-pro" data-aos="fade-up">
+      <div class="summary-header">
+        <div class="summary-icon">
+          <i class="fas fa-calendar-check"></i>
+        </div>
+        <h3>Confirme seu Agendamento</h3>
+        <p>Revise os detalhes antes de confirmar</p>
+      </div>
+      
+      <div class="summary-body">
+        <div class="summary-item-pro">
+          <div class="item-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <i class="fas fa-cut"></i>
+          </div>
+          <div class="item-content">
+            <span class="item-label">Serviço</span>
+            <span class="item-value">${bookingState.service?.nome || '-'}</span>
+          </div>
+        </div>
+        
+        <div class="summary-item-pro">
+          <div class="item-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+            <span class="avatar-initial">${barberInitial}</span>
+          </div>
+          <div class="item-content">
+            <span class="item-label">Barbeiro</span>
+            <span class="item-value">${bookingState.barber?.nome || '-'}</span>
+          </div>
+        </div>
+        
+        <div class="summary-item-pro">
+          <div class="item-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+            <i class="fas fa-calendar"></i>
+          </div>
+          <div class="item-content">
+            <span class="item-label">Data</span>
+            <span class="item-value">${dateFormatted}</span>
+          </div>
+        </div>
+        
+        <div class="summary-item-pro">
+          <div class="item-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div class="item-content">
+            <span class="item-label">Horário</span>
+            <span class="item-value">${bookingState.time || '-'}</span>
+          </div>
+        </div>
+        
+        <div class="summary-item-pro">
+          <div class="item-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+            <i class="fas fa-hourglass-half"></i>
+          </div>
+          <div class="item-content">
+            <span class="item-label">Duração</span>
+            <span class="item-value">${bookingState.service?.duracao || 30} minutos</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="summary-footer">
+        <div class="summary-total">
+          <span class="total-label">Valor Total</span>
+          <span class="total-value">R$ ${parseFloat(bookingState.service?.preco || 0).toFixed(2)}</span>
+        </div>
+        <div class="summary-note">
+          <i class="fas fa-info-circle"></i>
+          <span>Pagamento realizado no local</span>
+        </div>
+      </div>
     </div>
   `;
 }
 
-// Renderizar etapa
+// ===== CONTROLE DE ETAPAS =====
 function renderStep(step) {
-  // Esconder todas as etapas
   document.querySelectorAll('.booking-step').forEach(el => {
     el.classList.remove('active');
   });
   
-  // Mostrar etapa atual
   const stepEl = document.getElementById(`booking-step-${step}`);
   if (stepEl) {
     stepEl.classList.add('active');
   }
   
-  // Renderizar conteúdo específico
-  if (step === 1) {
-    renderBarbers(); // Primeiro escolhe o barbeiro
-  } else if (step === 2) {
-    renderServices(); // Depois escolhe o serviço (com preços atualizados)
-  } else if (step === 3) {
+  if (step === 1) renderBarbers();
+  else if (step === 2) renderServices();
+  else if (step === 3) {
     renderCalendar();
-    if (bookingState.date) {
-      loadAvailableTimes();
-    }
-  } else if (step === 4) {
-    renderSummary();
+    if (bookingState.date) loadAvailableTimes();
   }
+  else if (step === 4) renderSummary();
   
   updateNextButton();
 }
 
-// Atualizar progresso
 function updateProgress() {
   const steps = document.querySelectorAll('.progress-step');
   const progressLine = document.querySelector('.progress-line');
@@ -467,14 +566,12 @@ function updateProgress() {
     }
   });
   
-  // Atualizar linha de progresso
   if (progressLine) {
     const progress = ((bookingState.currentStep - 1) / 3) * 100;
     progressLine.style.width = `${progress}%`;
   }
 }
 
-// Próxima etapa
 function nextBookingStep() {
   if (bookingState.currentStep < 4) {
     bookingState.currentStep++;
@@ -485,7 +582,6 @@ function nextBookingStep() {
   }
 }
 
-// Etapa anterior
 function prevBookingStep() {
   if (bookingState.currentStep > 1) {
     bookingState.currentStep--;
@@ -494,7 +590,6 @@ function prevBookingStep() {
   }
 }
 
-// Atualizar botão próximo
 function updateNextButton() {
   const btn = document.getElementById('btn-booking-next');
   if (!btn) return;
@@ -502,28 +597,28 @@ function updateNextButton() {
   let canProceed = false;
   
   if (bookingState.currentStep === 1) {
-    canProceed = bookingState.barber !== null; // Primeiro escolhe barbeiro
-    btn.innerHTML = '<span>Próximo</span><i class="fas fa-arrow-right"></i>';
+    canProceed = bookingState.barber !== null;
+    btn.innerHTML = '<span>Continuar</span><i class="fas fa-arrow-right"></i>';
   } else if (bookingState.currentStep === 2) {
-    canProceed = bookingState.service !== null; // Depois escolhe serviço
-    btn.innerHTML = '<span>Próximo</span><i class="fas fa-arrow-right"></i>';
+    canProceed = bookingState.service !== null;
+    btn.innerHTML = '<span>Continuar</span><i class="fas fa-arrow-right"></i>';
   } else if (bookingState.currentStep === 3) {
     canProceed = bookingState.date !== null && bookingState.time !== null;
-    btn.innerHTML = '<span>Próximo</span><i class="fas fa-arrow-right"></i>';
+    btn.innerHTML = '<span>Revisar</span><i class="fas fa-arrow-right"></i>';
   } else if (bookingState.currentStep === 4) {
     canProceed = true;
-    btn.innerHTML = '<i class="fas fa-check"></i><span>Confirmar Agendamento</span>';
+    btn.innerHTML = '<i class="fas fa-check-circle"></i><span>Confirmar Agendamento</span>';
   }
   
   btn.disabled = !canProceed;
 }
 
-// Confirmar agendamento
+// ===== CONFIRMAÇÃO =====
 async function confirmarNovoAgendamento() {
   const btn = document.getElementById('btn-booking-next');
   if (btn) {
     btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Agendando...</span>';
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Processando...</span>';
   }
   
   try {
@@ -546,11 +641,9 @@ async function confirmarNovoAgendamento() {
     
     const data = await res.json();
     
-    // Verificar se foi sucesso (201 Created ou 200 OK)
     if (res.ok || res.status === 201 || data.success) {
-      showNotificationToast('Agendamento criado com sucesso!', 'success');
+      showNotificationToast('✅ Agendamento confirmado com sucesso!', 'success');
       
-      // Resetar estado
       bookingState = {
         currentStep: 1,
         service: null,
@@ -563,7 +656,6 @@ async function confirmarNovoAgendamento() {
         currentYear: new Date().getFullYear()
       };
       
-      // Voltar para lista de agendamentos
       setTimeout(() => {
         switchTab('meus-agendamentos');
         loadAppointmentsAndStats();
@@ -573,17 +665,17 @@ async function confirmarNovoAgendamento() {
       throw new Error(data.message || 'Erro ao criar agendamento');
     }
   } catch (error) {
-    console.error('Erro:', error);
+    console.error('❌ Erro:', error);
     showNotificationToast(error.message || 'Erro ao criar agendamento', 'error');
     
     if (btn) {
       btn.disabled = false;
-      btn.innerHTML = '<i class="fas fa-check"></i><span>Confirmar Agendamento</span>';
+      btn.innerHTML = '<i class="fas fa-check-circle"></i><span>Confirmar Agendamento</span>';
     }
   }
 }
 
-// Navegação do calendário
+// ===== NAVEGAÇÃO DO CALENDÁRIO =====
 function prevMonth() {
   bookingState.currentMonth--;
   
@@ -592,13 +684,10 @@ function prevMonth() {
     bookingState.currentYear--;
   }
   
-  // Limpar seleção de data e horário ao mudar de mês
   bookingState.date = null;
   bookingState.time = null;
-  
   renderCalendar();
   
-  // Limpar horários exibidos
   const container = document.getElementById('time-slots-new');
   if (container) container.innerHTML = '';
   
@@ -613,20 +702,17 @@ function nextMonth() {
     bookingState.currentYear++;
   }
   
-  // Limpar seleção de data e horário ao mudar de mês
   bookingState.date = null;
   bookingState.time = null;
-  
   renderCalendar();
   
-  // Limpar horários exibidos
   const container = document.getElementById('time-slots-new');
   if (container) container.innerHTML = '';
   
   updateNextButton();
 }
 
-// Exportar funções
+// ===== EXPORTAR FUNÇÕES =====
 window.initNovoAgendamento = initNovoAgendamento;
 window.selectService = selectService;
 window.selectBarber = selectBarber;
@@ -638,4 +724,4 @@ window.confirmarNovoAgendamento = confirmarNovoAgendamento;
 window.prevMonth = prevMonth;
 window.nextMonth = nextMonth;
 
-console.log('✅ Novo sistema de agendamento carregado');
+console.log('✅ Sistema profissional de agendamento carregado');
