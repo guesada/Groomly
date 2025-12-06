@@ -61,17 +61,26 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            padding: 0;
         }
         
         .brand-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 10px;
+            width: 180px;
+            height: 50px;
+            background: transparent;
+            border-radius: 0;
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: white;
+            justify-content: flex-start;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .brand-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: left center;
         }
         
         .nav-link {
@@ -96,7 +105,7 @@
         
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
         }
         
         .btn-outline-primary {
@@ -223,7 +232,7 @@
         .section-badge {
             display: inline-block;
             padding: 0.5rem 1rem;
-            background: rgba(99, 102, 241, 0.1);
+            background: rgba(16, 185, 129, 0.1);
             color: var(--primary);
             border-radius: 50px;
             font-size: 0.875rem;
@@ -418,8 +427,475 @@
             color: rgba(255, 255, 255, 0.5);
         }
         
+        /* ============================================
+           WIZARD MODAL STYLES - MODERN & ELEGANT
+           ============================================ */
+        
+        /* Progress Steps */
+        .wizard-progress {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+        
+        .step-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0.4;
+            transition: all 0.4s ease;
+            position: relative;
+        }
+        
+        .step-indicator.active {
+            opacity: 1;
+        }
+        
+        .step-indicator.completed {
+            opacity: 0.7;
+        }
+        
+        .step-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.4s ease;
+        }
+        
+        .step-indicator.active .step-circle {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            transform: scale(1.05);
+        }
+        
+        .step-indicator.completed .step-circle {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .step-label {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .step-indicator.active .step-label {
+            color: white;
+        }
+        
+        .step-line {
+            flex: 1;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.15);
+            margin: 0 1rem;
+            max-width: 80px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .step-line::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 0.5s ease;
+        }
+        
+        .step-indicator.completed + .step-line::after {
+            width: 100%;
+        }
+        
+        /* Form Steps */
+        .form-step {
+            display: none;
+            animation: fadeInUp 0.5s ease;
+        }
+        
+        .form-step.active {
+            display: block;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Account Type Cards */
+        .account-type-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .account-type-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(20, 184, 166, 0.1));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .account-type-card:hover {
+            border-color: rgba(16, 185, 129, 0.5);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.15);
+        }
+        
+        .account-type-card:hover::before {
+            opacity: 1;
+        }
+        
+        .account-type-card.selected {
+            border-color: var(--primary);
+            background: rgba(16, 185, 129, 0.1);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.2);
+        }
+        
+        .account-type-card.selected::before {
+            opacity: 1;
+        }
+        
+        .account-type-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+        
+        .account-type-card h4 {
+            color: white;
+            font-weight: 700;
+            font-size: 1.3rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .account-type-card p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.95rem;
+            margin: 0;
+        }
+        
+        /* Service Cards - Grid Style */
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        
+        .service-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(16, 185, 129, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .service-card:hover {
+            border-color: var(--primary);
+            background: rgba(16, 185, 129, 0.08);
+            transform: translateY(-3px);
+        }
+        
+        .service-card.selected {
+            border-color: var(--primary);
+            background: rgba(16, 185, 129, 0.15);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+        
+        .service-card .service-icon {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+        }
+        
+        .service-card h5 {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .service-card p {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.85rem;
+            margin: 0;
+        }
+        
+        .service-card .check-icon {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 24px;
+            height: 24px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.75rem;
+        }
+        
+        .service-card.selected .check-icon {
+            display: flex;
+        }
+        
+        /* Category Select - Modern Dropdown */
+        .category-select {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            color: white;
+            padding: 1rem 1.25rem;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .category-select:focus {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+            outline: none;
+            color: white;
+        }
+        
+        .category-select option {
+            background: #1a1a1a;
+            color: white;
+            padding: 1rem;
+        }
+        
+        /* Working Hours - Day Cards */
+        .day-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: all 0.3s ease;
+            margin-bottom: 0.75rem;
+        }
+        
+        .day-card.active {
+            background: rgba(16, 185, 129, 0.08);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+        
+        .day-card.inactive {
+            opacity: 0.5;
+            background: rgba(255, 255, 255, 0.02);
+        }
+        
+        .day-toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 52px;
+            height: 28px;
+        }
+        
+        .day-toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: 0.4s;
+            border-radius: 34px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+        
+        .day-name {
+            color: white;
+            font-weight: 600;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .day-name i {
+            color: var(--primary);
+        }
+        
+        .time-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .time-input-group label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        .time-input-group input[type="time"] {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            color: white;
+            padding: 0.75rem;
+            font-size: 0.95rem;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        
+        .time-input-group input[type="time"]:focus {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+            outline: none;
+        }
+        
+        /* Form Controls */
+        .form-control-modern {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            color: white;
+            padding: 1rem 1.25rem;
+            font-size: 1rem;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        
+        .form-control-modern:focus {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+            outline: none;
+            color: white;
+        }
+        
+        .form-control-modern::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+        
+        /* Form Labels */
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Buttons */
+        .btn-wizard {
+            padding: 0.875rem 2rem;
+            font-weight: 600;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-wizard-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        .btn-wizard-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.25);
+            color: white;
+        }
+        
+        .btn-wizard-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-wizard-secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+        
         /* Responsive */
         @media (max-width: 768px) {
+            .brand-icon {
+                width: 140px;
+                height: 40px;
+            }
+            
             .hero h1 {
                 font-size: 2.5rem;
             }
@@ -443,6 +919,24 @@
             .cta-content h2 {
                 font-size: 2rem;
             }
+            
+            .service-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .wizard-progress {
+                padding: 1rem 0;
+            }
+            
+            .step-circle {
+                width: 40px;
+                height: 40px;
+                font-size: 0.9rem;
+            }
+            
+            .step-line {
+                max-width: 40px;
+            }
         }
     </style>
 </head>
@@ -452,9 +946,8 @@
         <div class="container">
             <a class="navbar-brand" href="/">
                 <div class="brand-icon">
-                    <i class="bi bi-scissors"></i>
+                    <img src="/static/images/logo.png" alt="Groomly Logo">
                 </div>
-                <span>Groomly</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -468,10 +961,10 @@
                         <a class="nav-link" href="#how-it-works">Como Funciona</a>
                     </li>
                     <li class="nav-item ms-3">
-                        <a href="/cliente" class="btn btn-outline-primary">Entrar</a>
+                        <a href="#" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#loginModal">Entrar</a>
                     </li>
                     <li class="nav-item ms-2">
-                        <a href="/barbeiro" class="btn btn-primary">Sou Profissional</a>
+                        <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerModal" data-professional="true">Sou Profissional</a>
                     </li>
                 </ul>
             </div>
@@ -495,7 +988,7 @@
                             Gerencie agendamentos, clientes e pagamentos em uma única plataforma inteligente. Aumente sua produtividade em até 300%.
                         </p>
                         <div class="hero-buttons">
-                            <a href="/cliente" class="btn btn-primary btn-lg">
+                            <a href="#" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#registerModal">
                                 <i class="bi bi-rocket-takeoff"></i> Começar Agora
                             </a>
                             <a href="#how-it-works" class="btn btn-outline-primary btn-lg">
@@ -652,7 +1145,7 @@
             <div class="cta-content" data-aos="zoom-in">
                 <h2>Pronto Para Transformar Seu Negócio?</h2>
                 <p>Junte-se a milhares de profissionais que já usam o Groomly</p>
-                <a href="/barbeiro" class="btn btn-light btn-lg">
+                <a href="#" class="btn btn-light btn-lg" data-bs-toggle="modal" data-bs-target="#registerModal">
                     <i class="bi bi-rocket-takeoff"></i> Começar Gratuitamente
                 </a>
             </div>
@@ -706,111 +1199,601 @@
         </div>
     </footer>
 
-    <!-- Login Modal -->
-    <div class="modal fade" id="loginModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg">
-                <div class="modal-header border-0 pb-0">
-                    <h5 class="modal-title fw-bold">
-                        <i class="bi bi-box-arrow-in-right text-primary"></i> Entrar no Groomly
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <form id="loginForm">
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Email</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0">
-                                    <i class="bi bi-envelope text-muted"></i>
-                                </span>
-                                <input type="email" class="form-control border-start-0 ps-0" name="email" placeholder="seu@email.com" required>
+    <!-- Login Modal - Fullscreen -->
+    <div class="modal fade" id="loginModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content bg-dark">
+                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-4" data-bs-dismiss="modal" style="z-index: 1050;"></button>
+                
+                <div class="modal-body p-0">
+                    <div class="container-fluid h-100">
+                        <div class="row h-100">
+                            <!-- Left Side - Branding -->
+                            <div class="col-lg-6 d-none d-lg-flex align-items-center justify-content-center p-5" style="background: linear-gradient(135deg, var(--primary), var(--primary-dark));">
+                                <div class="text-center text-white">
+                                    <div class="brand-icon mx-auto mb-4" style="width: 80px; height: 80px; background: white; padding: 10px;">
+                                        <img src="/static/images/logo.png" alt="Groomly Logo" style="width: 100%; height: 100%; object-fit: contain;">
+                                    </div>
+                                    <h2 class="display-4 fw-bold mb-3">Bem-vindo de volta!</h2>
+                                    <p class="lead opacity-90">Acesse sua conta e continue gerenciando seus agendamentos</p>
+                                    <div class="d-flex align-items-center justify-content-center gap-4 mt-5">
+                                        <div class="text-center">
+                                            <h3 class="fw-bold mb-0">10k+</h3>
+                                            <small class="opacity-75">Profissionais</small>
+                                        </div>
+                                        <div class="text-center">
+                                            <h3 class="fw-bold mb-0">500k+</h3>
+                                            <small class="opacity-75">Agendamentos</small>
+                                        </div>
+                                        <div class="text-center">
+                                            <h3 class="fw-bold mb-0">4.9</h3>
+                                            <small class="opacity-75">Avaliação</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Right Side - Form -->
+                            <div class="col-lg-6 d-flex align-items-center justify-content-center p-5">
+                                <div class="w-100" style="max-width: 450px;">
+                                    <div class="text-white mb-5">
+                                        <h1 class="display-5 fw-bold mb-2">Entrar</h1>
+                                        <p class="text-white-50">Digite suas credenciais para acessar</p>
+                                    </div>
+                                    
+                                    <form id="loginForm">
+                                        <div class="mb-4">
+                                            <label class="form-label text-white fw-semibold mb-2">Email</label>
+                                            <input type="email" class="form-control-modern" name="email" placeholder="seu@email.com" required>
+                                        </div>
+                                        
+                                        <div class="mb-4">
+                                            <label class="form-label text-white fw-semibold mb-2">Senha</label>
+                                            <input type="password" class="form-control-modern" name="password" placeholder="••••••••" required>
+                                        </div>
+                                        
+                                        <div class="d-flex justify-content-between align-items-center mb-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="rememberMe">
+                                                <label class="form-check-label text-white-50" for="rememberMe">
+                                                    Lembrar-me
+                                                </label>
+                                            </div>
+                                            <a href="#" class="text-primary text-decoration-none fw-semibold">Esqueceu a senha?</a>
+                                        </div>
+                                        
+                                        <button type="submit" class="btn btn-wizard btn-wizard-primary w-100 mb-4">
+                                            <i class="bi bi-box-arrow-in-right me-2"></i>Entrar
+                                        </button>
+                                        
+                                        <p class="text-center text-white-50 mb-0">
+                                            Não tem uma conta? 
+                                            <a href="#" class="text-primary fw-semibold text-decoration-none" data-bs-toggle="modal" data-bs-target="#registerModal" data-bs-dismiss="modal">
+                                                Cadastre-se gratuitamente
+                                            </a>
+                                        </p>
+                                    </form>
+                                </div>
                             </div>
                         </div>
-                        <div class="mb-4">
-                            <label class="form-label fw-semibold">Senha</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0">
-                                    <i class="bi bi-lock text-muted"></i>
-                                </span>
-                                <input type="password" class="form-control border-start-0 ps-0" name="password" placeholder="••••••••" required>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100 py-3 mb-3">
-                            <i class="bi bi-check-circle"></i> Entrar
-                        </button>
-                        <div class="text-center">
-                            <small class="text-muted">
-                                Não tem conta? 
-                                <a href="#" class="text-primary fw-semibold text-decoration-none" data-bs-toggle="modal" data-bs-target="#registerModal" data-bs-dismiss="modal">
-                                    Cadastre-se gratuitamente
-                                </a>
-                            </small>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Register Modal -->
-    <div class="modal fade" id="registerModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg">
-                <div class="modal-header border-0 pb-0">
-                    <h5 class="modal-title fw-bold">
-                        <i class="bi bi-person-plus text-primary"></i> Criar Conta no Groomly
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <form id="registerForm">
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Nome Completo</label>
-                            <input type="text" class="form-control" name="name" placeholder="Seu nome completo" required>
+    <!-- Register Modal - Fullscreen with Wizard -->
+    <div class="modal fade" id="registerModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);">
+                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-4" data-bs-dismiss="modal" style="z-index: 1050;"></button>
+                
+                <div class="modal-body p-0">
+                    <div class="container-fluid h-100">
+                        <div class="row h-100">
+                            <!-- Left Side - Branding & Info -->
+                            <div class="col-lg-5 d-none d-lg-flex flex-column align-items-center justify-content-center p-5" style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); position: relative; overflow: hidden;">
+                                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('data:image/svg+xml,<svg width=&quot;100&quot; height=&quot;100&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;><circle cx=&quot;50&quot; cy=&quot;50&quot; r=&quot;2&quot; fill=&quot;white&quot; opacity=&quot;0.1&quot;/></svg>'); opacity: 0.3;"></div>
+                                
+                                <div class="text-center text-white" style="position: relative; z-index: 2;">
+                                    <div class="brand-icon mx-auto mb-4" style="width: 90px; height: 90px; background: white; padding: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.3);">
+                                        <img src="/static/images/logo.png" alt="Groomly Logo" style="width: 100%; height: 100%; object-fit: contain;">
+                                    </div>
+                                    <h2 class="display-4 fw-bold mb-3">Junte-se ao Groomly</h2>
+                                    <p class="lead opacity-90 mb-5">Crie sua conta e transforme seu negócio de beleza hoje mesmo</p>
+                                    
+                                    <div class="row g-3 mt-5">
+                                        <div class="col-12">
+                                            <div class="d-flex align-items-center gap-3 p-3 rounded" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);">
+                                                <div style="width: 50px; height: 50px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="bi bi-check-circle-fill fs-3"></i>
+                                                </div>
+                                                <div class="text-start">
+                                                    <div class="fw-bold fs-5">Grátis para começar</div>
+                                                    <small class="opacity-75">Sem cartão de crédito necessário</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="d-flex align-items-center gap-3 p-3 rounded" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);">
+                                                <div style="width: 50px; height: 50px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="bi bi-shield-check fs-3"></i>
+                                                </div>
+                                                <div class="text-start">
+                                                    <div class="fw-bold fs-5">100% Seguro</div>
+                                                    <small class="opacity-75">Seus dados protegidos</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="d-flex align-items-center gap-3 p-3 rounded" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);">
+                                                <div style="width: 50px; height: 50px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="bi bi-lightning-charge-fill fs-3"></i>
+                                                </div>
+                                                <div class="text-start">
+                                                    <div class="fw-bold fs-5">Configuração rápida</div>
+                                                    <small class="opacity-75">Pronto em 2 minutos</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Right Side - Wizard Form -->
+                            <div class="col-lg-7 d-flex flex-column p-5" style="overflow-y: auto;">
+                                <div class="w-100 mx-auto" style="max-width: 700px;">
+                                    
+                                    <!-- Progress Steps -->
+                                    <div class="wizard-progress">
+                                        <div class="step-indicator active" data-step="1">
+                                            <div class="step-circle">1</div>
+                                            <div class="step-label">Tipo</div>
+                                        </div>
+                                        <div class="step-line" id="step1Line"></div>
+                                        <div class="step-indicator" data-step="2">
+                                            <div class="step-circle">2</div>
+                                            <div class="step-label">Dados</div>
+                                        </div>
+                                        <div class="step-line" id="step2Line"></div>
+                                        <div class="step-indicator" data-step="3" id="step3Indicator" style="display: none;">
+                                            <div class="step-circle">3</div>
+                                            <div class="step-label">Serviços</div>
+                                        </div>
+                                        <div class="step-line" id="step3Line" style="display: none;"></div>
+                                        <div class="step-indicator" data-step="4" id="step4Indicator" style="display: none;">
+                                            <div class="step-circle">4</div>
+                                            <div class="step-label">Horários</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <form id="registerForm">
+                                        
+                                        <!-- Step 1: Account Type -->
+                                        <div class="form-step active" data-step="1">
+                                            <div class="text-white mb-5">
+                                                <h2 class="fw-bold mb-2">Escolha o tipo de conta</h2>
+                                                <p class="text-white-50">Selecione como você deseja usar o Groomly</p>
+                                            </div>
+                                            
+                                            <div class="row g-4">
+                                                <div class="col-md-6">
+                                                    <div class="account-type-card" onclick="selectAccountType('cliente', this)">
+                                                        <div class="account-type-icon">
+                                                            <i class="bi bi-person"></i>
+                                                        </div>
+                                                        <h4>Sou Cliente</h4>
+                                                        <p>Quero agendar serviços de beleza e bem-estar</p>
+                                                        <input type="radio" name="userType" value="cliente" id="typeCliente" style="display: none;" required>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="account-type-card" onclick="selectAccountType('profissional', this)">
+                                                        <div class="account-type-icon">
+                                                            <i class="bi bi-briefcase"></i>
+                                                        </div>
+                                                        <h4>Sou Profissional</h4>
+                                                        <p>Quero oferecer meus serviços e gerenciar agendamentos</p>
+                                                        <input type="radio" name="userType" value="profissional" id="typeProfissional" style="display: none;" required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="d-flex justify-content-end mt-5">
+                                                <button type="button" class="btn btn-wizard btn-wizard-primary" onclick="nextStep(event)">
+                                                    <span>Continuar</span><i class="bi bi-arrow-right"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Step 2: Basic Info -->
+                                        <div class="form-step" data-step="2">
+                                            <div class="text-white mb-5">
+                                                <h2 class="fw-bold mb-2">Informações básicas</h2>
+                                                <p class="text-white-50">Preencha seus dados pessoais</p>
+                                            </div>
+                                            
+                                            <div class="row g-4">
+                                                <div class="col-12">
+                                                    <label class="form-label text-white fw-semibold mb-2">
+                                                        <i class="bi bi-person me-2"></i>Nome Completo
+                                                    </label>
+                                                    <input type="text" class="form-control-modern" name="nome" placeholder="Digite seu nome completo" required>
+                                                </div>
+                                                
+                                                <div class="col-md-6">
+                                                    <label class="form-label text-white fw-semibold mb-2">
+                                                        <i class="bi bi-envelope me-2"></i>Email
+                                                    </label>
+                                                    <input type="email" class="form-control-modern" name="email" placeholder="seu@email.com" required>
+                                                </div>
+                                                
+                                                <div class="col-md-6">
+                                                    <label class="form-label text-white fw-semibold mb-2">
+                                                        <i class="bi bi-phone me-2"></i>Telefone
+                                                    </label>
+                                                    <input type="tel" class="form-control-modern" name="telefone" placeholder="(00) 00000-0000" required>
+                                                </div>
+                                                
+                                                <div class="col-md-6">
+                                                    <label class="form-label text-white fw-semibold mb-2">
+                                                        <i class="bi bi-lock me-2"></i>Senha
+                                                    </label>
+                                                    <input type="password" class="form-control-modern" name="password" placeholder="Mínimo 6 caracteres" required minlength="6">
+                                                </div>
+                                                
+                                                <div class="col-md-6">
+                                                    <label class="form-label text-white fw-semibold mb-2">
+                                                        <i class="bi bi-lock-fill me-2"></i>Confirmar Senha
+                                                    </label>
+                                                    <input type="password" class="form-control-modern" name="confirmPassword" placeholder="Digite a senha novamente" required minlength="6">
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="d-flex justify-content-between mt-5">
+                                                <button type="button" class="btn btn-wizard btn-wizard-secondary" onclick="prevStep()">
+                                                    <i class="bi bi-arrow-left"></i><span>Voltar</span>
+                                                </button>
+                                                <button type="button" class="btn btn-wizard btn-wizard-primary" onclick="nextStep()">
+                                                    <span>Continuar</span><i class="bi bi-arrow-right"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Step 3: Services & Category (Professional Only) -->
+                                        <div class="form-step" data-step="3">
+                                            <div class="text-white mb-4">
+                                                <h2 class="fw-bold mb-2">Serviços Oferecidos</h2>
+                                                <p class="text-white-50">Selecione sua especialidade e os serviços que você oferece</p>
+                                            </div>
+                                            
+                                            <!-- Category Selection -->
+                                            <div class="mb-5">
+                                                <label class="form-label text-white fw-semibold mb-3">
+                                                    <i class="bi bi-star me-2"></i>Selecione sua especialidade
+                                                </label>
+                                                <select class="category-select w-100" name="categoria" required>
+                                                    <option value="">Escolha sua categoria...</option>
+                                                    <option value="Cabeleireiro">💇 Cabeleireiro(a)</option>
+                                                    <option value="Manicure">💅 Manicure</option>
+                                                    <option value="Pedicure">🦶 Pedicure</option>
+                                                    <option value="Esteticista">✨ Esteticista</option>
+                                                    <option value="Maquiador">💄 Maquiador(a)</option>
+                                                    <option value="Barbeiro">✂️ Barbeiro</option>
+                                                    <option value="Depilador">🪒 Depilador(a)</option>
+                                                    <option value="Massagista">💆 Massagista</option>
+                                                    <option value="Designer de Sobrancelhas">👁️ Designer de Sobrancelhas</option>
+                                                </select>
+                                            </div>
+                                            
+                                            <!-- Services Grid -->
+                                            <div class="mb-4">
+                                                <label class="form-label text-white fw-semibold mb-3">
+                                                    <i class="bi bi-scissors me-2"></i>Selecione todos os serviços que você oferece
+                                                </label>
+                                                <div class="service-grid">
+                                                    <div class="service-card" onclick="toggleService(this, 'Corte de Cabelo')">
+                                                        <div class="check-icon"><i class="bi bi-check"></i></div>
+                                                        <div class="service-icon">✂️</div>
+                                                        <h5>Corte de Cabelo</h5>
+                                                        <p>Cortes masculinos e femininos</p>
+                                                        <input type="checkbox" name="servicos[]" value="Corte de Cabelo" style="display: none;">
+                                                    </div>
+                                                    
+                                                    <div class="service-card" onclick="toggleService(this, 'Coloração')">
+                                                        <div class="check-icon"><i class="bi bi-check"></i></div>
+                                                        <div class="service-icon">🎨</div>
+                                                        <h5>Coloração</h5>
+                                                        <p>Tintura e mechas</p>
+                                                        <input type="checkbox" name="servicos[]" value="Coloração" style="display: none;">
+                                                    </div>
+                                                    
+                                                    <div class="service-card" onclick="toggleService(this, 'Manicure')">
+                                                        <div class="check-icon"><i class="bi bi-check"></i></div>
+                                                        <div class="service-icon">💅</div>
+                                                        <h5>Manicure</h5>
+                                                        <p>Cuidados com as unhas</p>
+                                                        <input type="checkbox" name="servicos[]" value="Manicure" style="display: none;">
+                                                    </div>
+                                                    
+                                                    <div class="service-card" onclick="toggleService(this, 'Pedicure')">
+                                                        <div class="check-icon"><i class="bi bi-check"></i></div>
+                                                        <div class="service-icon">🦶</div>
+                                                        <h5>Pedicure</h5>
+                                                        <p>Cuidados com os pés</p>
+                                                        <input type="checkbox" name="servicos[]" value="Pedicure" style="display: none;">
+                                                    </div>
+                                                    
+                                                    <div class="service-card" onclick="toggleService(this, 'Barba')">
+                                                        <div class="check-icon"><i class="bi bi-check"></i></div>
+                                                        <div class="service-icon">🧔</div>
+                                                        <h5>Barba</h5>
+                                                        <p>Aparar e modelar</p>
+                                                        <input type="checkbox" name="servicos[]" value="Barba" style="display: none;">
+                                                    </div>
+                                                    
+                                                    <div class="service-card" onclick="toggleService(this, 'Maquiagem')">
+                                                        <div class="check-icon"><i class="bi bi-check"></i></div>
+                                                        <div class="service-icon">💄</div>
+                                                        <h5>Maquiagem</h5>
+                                                        <p>Social, noiva, artística</p>
+                                                        <input type="checkbox" name="servicos[]" value="Maquiagem" style="display: none;">
+                                                    </div>
+                                                    
+                                                    <div class="service-card" onclick="toggleService(this, 'Depilação')">
+                                                        <div class="check-icon"><i class="bi bi-check"></i></div>
+                                                        <div class="service-icon">✨</div>
+                                                        <h5>Depilação</h5>
+                                                        <p>Cera e laser</p>
+                                                        <input type="checkbox" name="servicos[]" value="Depilação" style="display: none;">
+                                                    </div>
+                                                    
+                                                    <div class="service-card" onclick="toggleService(this, 'Massagem')">
+                                                        <div class="check-icon"><i class="bi bi-check"></i></div>
+                                                        <div class="service-icon">💆</div>
+                                                        <h5>Massagem</h5>
+                                                        <p>Relaxante e terapêutica</p>
+                                                        <input type="checkbox" name="servicos[]" value="Massagem" style="display: none;">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="d-flex justify-content-between mt-5">
+                                                <button type="button" class="btn btn-wizard btn-wizard-secondary" onclick="prevStep()">
+                                                    <i class="bi bi-arrow-left"></i><span>Voltar</span>
+                                                </button>
+                                                <button type="button" class="btn btn-wizard btn-wizard-primary" onclick="nextStep()">
+                                                    <span>Continuar</span><i class="bi bi-arrow-right"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Step 4: Working Hours (Professional Only) -->
+                                        <div class="form-step" data-step="4">
+                                            <div class="text-white mb-4">
+                                                <h2 class="fw-bold mb-2">Horários de Atendimento</h2>
+                                                <p class="text-white-50">Configure seus dias e horários de trabalho</p>
+                                            </div>
+                                            
+                                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                                <div>
+                                                    <p class="text-white-50 mb-0">
+                                                        <i class="bi bi-info-circle me-2"></i>Desmarque os dias em que você não trabalha
+                                                    </p>
+                                                </div>
+                                                <button type="button" class="btn btn-sm btn-wizard-secondary" onclick="toggleAllDays()">
+                                                    <i class="bi bi-check-all me-2"></i>Marcar/Desmarcar Todos
+                                                </button>
+                                            </div>
+                                            
+                                            <div class="row g-3">
+                                                <!-- Segunda-feira -->
+                                                <div class="col-12">
+                                                    <div class="day-card active" data-day="seg">
+                                                        <div class="d-flex align-items-center justify-content-between mb-3">
+                                                            <div class="day-name">
+                                                                <i class="bi bi-calendar-day"></i>
+                                                                <span>Segunda-feira</span>
+                                                            </div>
+                                                            <label class="day-toggle-switch">
+                                                                <input type="checkbox" class="day-toggle" name="dias[]" value="1" id="diaSeg" checked>
+                                                                <span class="toggle-slider"></span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="time-inputs">
+                                                            <div class="time-input-group">
+                                                                <label>Abertura</label>
+                                                                <input type="time" name="seg_inicio" value="09:00" required>
+                                                            </div>
+                                                            <div class="time-input-group">
+                                                                <label>Fechamento</label>
+                                                                <input type="time" name="seg_fim" value="18:00" required>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Terça-feira -->
+                                                <div class="col-12">
+                                                    <div class="day-card active" data-day="ter">
+                                                        <div class="d-flex align-items-center justify-content-between mb-3">
+                                                            <div class="day-name">
+                                                                <i class="bi bi-calendar-day"></i>
+                                                                <span>Terça-feira</span>
+                                                            </div>
+                                                            <label class="day-toggle-switch">
+                                                                <input type="checkbox" class="day-toggle" name="dias[]" value="2" id="diaTer" checked>
+                                                                <span class="toggle-slider"></span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="time-inputs">
+                                                            <div class="time-input-group">
+                                                                <label>Abertura</label>
+                                                                <input type="time" name="ter_inicio" value="09:00" required>
+                                                            </div>
+                                                            <div class="time-input-group">
+                                                                <label>Fechamento</label>
+                                                                <input type="time" name="ter_fim" value="18:00" required>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Quarta-feira -->
+                                                <div class="col-12">
+                                                    <div class="day-card active" data-day="qua">
+                                                        <div class="d-flex align-items-center justify-content-between mb-3">
+                                                            <div class="day-name">
+                                                                <i class="bi bi-calendar-day"></i>
+                                                                <span>Quarta-feira</span>
+                                                            </div>
+                                                            <label class="day-toggle-switch">
+                                                                <input type="checkbox" class="day-toggle" name="dias[]" value="3" id="diaQua" checked>
+                                                                <span class="toggle-slider"></span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="time-inputs">
+                                                            <div class="time-input-group">
+                                                                <label>Abertura</label>
+                                                                <input type="time" name="qua_inicio" value="09:00" required>
+                                                            </div>
+                                                            <div class="time-input-group">
+                                                                <label>Fechamento</label>
+                                                                <input type="time" name="qua_fim" value="18:00" required>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Quinta-feira -->
+                                                <div class="col-12">
+                                                    <div class="day-card active" data-day="qui">
+                                                        <div class="d-flex align-items-center justify-content-between mb-3">
+                                                            <div class="day-name">
+                                                                <i class="bi bi-calendar-day"></i>
+                                                                <span>Quinta-feira</span>
+                                                            </div>
+                                                            <label class="day-toggle-switch">
+                                                                <input type="checkbox" class="day-toggle" name="dias[]" value="4" id="diaQui" checked>
+                                                                <span class="toggle-slider"></span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="time-inputs">
+                                                            <div class="time-input-group">
+                                                                <label>Abertura</label>
+                                                                <input type="time" name="qui_inicio" value="09:00" required>
+                                                            </div>
+                                                            <div class="time-input-group">
+                                                                <label>Fechamento</label>
+                                                                <input type="time" name="qui_fim" value="18:00" required>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Sexta-feira -->
+                                                <div class="col-12">
+                                                    <div class="day-card active" data-day="sex">
+                                                        <div class="d-flex align-items-center justify-content-between mb-3">
+                                                            <div class="day-name">
+                                                                <i class="bi bi-calendar-day"></i>
+                                                                <span>Sexta-feira</span>
+                                                            </div>
+                                                            <label class="day-toggle-switch">
+                                                                <input type="checkbox" class="day-toggle" name="dias[]" value="5" id="diaSex" checked>
+                                                                <span class="toggle-slider"></span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="time-inputs">
+                                                            <div class="time-input-group">
+                                                                <label>Abertura</label>
+                                                                <input type="time" name="sex_inicio" value="09:00" required>
+                                                            </div>
+                                                            <div class="time-input-group">
+                                                                <label>Fechamento</label>
+                                                                <input type="time" name="sex_fim" value="18:00" required>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Sábado -->
+                                                <div class="col-12">
+                                                    <div class="day-card active" data-day="sab">
+                                                        <div class="d-flex align-items-center justify-content-between mb-3">
+                                                            <div class="day-name">
+                                                                <i class="bi bi-calendar-day"></i>
+                                                                <span>Sábado</span>
+                                                            </div>
+                                                            <label class="day-toggle-switch">
+                                                                <input type="checkbox" class="day-toggle" name="dias[]" value="6" id="diaSab" checked>
+                                                                <span class="toggle-slider"></span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="time-inputs">
+                                                            <div class="time-input-group">
+                                                                <label>Abertura</label>
+                                                                <input type="time" name="sab_inicio" value="09:00" required>
+                                                            </div>
+                                                            <div class="time-input-group">
+                                                                <label>Fechamento</label>
+                                                                <input type="time" name="sab_fim" value="14:00" required>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Domingo -->
+                                                <div class="col-12">
+                                                    <div class="day-card inactive" data-day="dom">
+                                                        <div class="d-flex align-items-center justify-content-between mb-3">
+                                                            <div class="day-name">
+                                                                <i class="bi bi-calendar-day"></i>
+                                                                <span>Domingo</span>
+                                                            </div>
+                                                            <label class="day-toggle-switch">
+                                                                <input type="checkbox" class="day-toggle" name="dias[]" value="0" id="diaDom">
+                                                                <span class="toggle-slider"></span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="time-inputs" style="display: none;">
+                                                            <div class="time-input-group">
+                                                                <label>Abertura</label>
+                                                                <input type="time" name="dom_inicio" value="09:00">
+                                                            </div>
+                                                            <div class="time-input-group">
+                                                                <label>Fechamento</label>
+                                                                <input type="time" name="dom_fim" value="14:00">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="d-flex justify-content-between mt-5">
+                                                <button type="button" class="btn btn-wizard btn-wizard-secondary" onclick="prevStep()">
+                                                    <i class="bi bi-arrow-left"></i><span>Voltar</span>
+                                                </button>
+                                                <button type="submit" class="btn btn-wizard btn-wizard-primary">
+                                                    <i class="bi bi-check-circle me-2"></i>Finalizar Cadastro
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                    </form>
+                                </div>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Email</label>
-                            <input type="email" class="form-control" name="email" placeholder="seu@email.com" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Telefone</label>
-                            <input type="tel" class="form-control" name="phone" placeholder="(11) 98765-4321">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Senha</label>
-                            <input type="password" class="form-control" name="password" placeholder="Mínimo 6 caracteres" required minlength="6">
-                            <small class="text-muted">Use pelo menos 6 caracteres</small>
-                        </div>
-                        <div class="mb-4">
-                            <label class="form-label fw-semibold">Tipo de Conta</label>
-                            <select class="form-select" name="userType" required>
-                                <option value="">Selecione o tipo de conta...</option>
-                                <option value="cliente">👤 Cliente - Quero agendar serviços</option>
-                                <option value="profissional">💼 Profissional - Quero oferecer serviços</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100 py-3 mb-3">
-                            <i class="bi bi-rocket-takeoff"></i> Criar Conta Gratuitamente
-                        </button>
-                        <div class="text-center">
-                            <small class="text-muted">
-                                Já tem conta? 
-                                <a href="#" class="text-primary fw-semibold text-decoration-none" data-bs-toggle="modal" data-bs-target="#loginModal" data-bs-dismiss="modal">
-                                    Faça login
-                                </a>
-                            </small>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Toast Container -->
-    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;"></div>
+    <div id="toastContainer" class="position-fixed top-0 end-0 p-3" style="z-index: 9999;"></div>
 
-    <!-- Bootstrap JS -->
+    <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     
     <!-- AOS Animation -->
@@ -823,8 +1806,7 @@
         // Initialize AOS
         AOS.init({
             duration: 800,
-            once: true,
-            offset: 100
+            once: true
         });
         
         // Navbar scroll effect
@@ -836,23 +1818,31 @@
                 navbar.classList.remove('scrolled');
             }
         });
-
-        // Axios config
-        axios.defaults.withCredentials = true;
-
+        
         // Toast notification
-        function showToast(message, type = 'success') {
-            const toastContainer = document.querySelector('.toast-container');
+        function showToast(message, type = 'info') {
+            const toastContainer = document.getElementById('toastContainer');
             const toastId = 'toast-' + Date.now();
             
-            const bgColor = type === 'success' ? 'bg-success' : type === 'danger' ? 'bg-danger' : 'bg-warning';
+            const bgColors = {
+                success: 'bg-success',
+                danger: 'bg-danger',
+                warning: 'bg-warning',
+                info: 'bg-info'
+            };
+            
+            const icons = {
+                success: 'bi-check-circle-fill',
+                danger: 'bi-x-circle-fill',
+                warning: 'bi-exclamation-triangle-fill',
+                info: 'bi-info-circle-fill'
+            };
             
             const toastHTML = `
-                <div id="${toastId}" class="toast align-items-center text-white ${bgColor} border-0" role="alert">
+                <div id="${toastId}" class="toast align-items-center text-white ${bgColors[type]} border-0" role="alert">
                     <div class="d-flex">
                         <div class="toast-body">
-                            <i class="bi bi-${type === 'success' ? 'check-circle' : type === 'danger' ? 'x-circle' : 'exclamation-circle'}"></i>
-                            ${message}
+                            <i class="bi ${icons[type]} me-2"></i>${message}
                         </div>
                         <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
                     </div>
@@ -868,21 +1858,241 @@
                 toastElement.remove();
             });
         }
-
+        
         // Loading overlay
         function showLoading() {
             const overlay = document.createElement('div');
             overlay.id = 'loadingOverlay';
-            overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:9999;';
+            overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:9999;';
             overlay.innerHTML = '<div class="spinner-border text-light" style="width:3rem;height:3rem;"></div>';
             document.body.appendChild(overlay);
         }
-
+        
         function hideLoading() {
             const overlay = document.getElementById('loadingOverlay');
             if (overlay) overlay.remove();
         }
-
+        
+        // ============================================
+        // WIZARD NAVIGATION
+        // ============================================
+        
+        let currentStep = 1;
+        let isProfessional = false;
+        
+        function selectAccountType(type, element) {
+            // Remove selection from all cards
+            document.querySelectorAll('.account-type-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Add selection to clicked card
+            element.classList.add('selected');
+            
+            // Check the radio button
+            if (type === 'cliente') {
+                document.getElementById('typeCliente').checked = true;
+                isProfessional = false;
+                
+                // Hide professional steps (3 and 4)
+                const step3Indicator = document.getElementById('step3Indicator');
+                const step3Line = document.getElementById('step3Line');
+                const step4Indicator = document.getElementById('step4Indicator');
+                const step4Line = document.getElementById('step4Line');
+                
+                if (step3Indicator) step3Indicator.style.display = 'none';
+                if (step3Line) step3Line.style.display = 'none';
+                if (step4Indicator) step4Indicator.style.display = 'none';
+                if (step4Line) step4Line.style.display = 'none';
+            } else {
+                document.getElementById('typeProfissional').checked = true;
+                isProfessional = true;
+                
+                // Show professional steps (3 and 4)
+                const step3Indicator = document.getElementById('step3Indicator');
+                const step3Line = document.getElementById('step3Line');
+                const step4Indicator = document.getElementById('step4Indicator');
+                const step4Line = document.getElementById('step4Line');
+                
+                if (step3Indicator) step3Indicator.style.display = 'flex';
+                if (step3Line) step3Line.style.display = 'block';
+                if (step4Indicator) step4Indicator.style.display = 'flex';
+                if (step4Line) step4Line.style.display = 'block';
+            }
+        }
+        
+        function nextStep(e) {
+            if (e) e.preventDefault();
+            
+            console.log('nextStep called, currentStep:', currentStep);
+            
+            const currentStepEl = document.querySelector(`.form-step[data-step="${currentStep}"]`);
+            
+            // Validate current step
+            const inputs = currentStepEl.querySelectorAll('input[required], select[required]');
+            let isValid = true;
+            
+            inputs.forEach(input => {
+                if (input.type === 'radio') {
+                    const radioGroup = currentStepEl.querySelectorAll(`input[name="${input.name}"]`);
+                    const isChecked = Array.from(radioGroup).some(radio => radio.checked);
+                    console.log('Radio validation:', input.name, 'isChecked:', isChecked);
+                    if (!isChecked) isValid = false;
+                } else if (input.type === 'checkbox') {
+                    // For services, at least one should be checked
+                    if (input.name === 'servicos[]') {
+                        const anyChecked = currentStepEl.querySelectorAll('input[name="servicos[]"]:checked').length > 0;
+                        if (!anyChecked) {
+                            isValid = false;
+                            showToast('Selecione pelo menos um serviço', 'warning');
+                        }
+                    }
+                } else if (!input.value) {
+                    isValid = false;
+                    input.classList.add('is-invalid');
+                } else {
+                    input.classList.remove('is-invalid');
+                }
+            });
+            
+            // Password validation
+            if (currentStep === 2) {
+                const password = currentStepEl.querySelector('input[name="password"]').value;
+                const confirmPassword = currentStepEl.querySelector('input[name="confirmPassword"]').value;
+                
+                if (password !== confirmPassword) {
+                    showToast('As senhas não coincidem', 'warning');
+                    return;
+                }
+            }
+            
+            console.log('Validation result:', isValid);
+            
+            if (!isValid) {
+                showToast('Por favor, preencha todos os campos obrigatórios', 'warning');
+                return;
+            }
+            
+            // Handle step transitions
+            if (currentStep === 1) {
+                const userType = document.querySelector('input[name="userType"]:checked').value;
+                isProfessional = userType === 'profissional';
+                
+                // Show/hide professional steps
+                const step3Indicator = document.getElementById('step3Indicator');
+                const step3Line = document.getElementById('step3Line');
+                const step4Indicator = document.getElementById('step4Indicator');
+                const step4Line = document.getElementById('step4Line');
+                
+                if (isProfessional) {
+                    if (step3Indicator) step3Indicator.style.display = 'flex';
+                    if (step3Line) step3Line.style.display = 'block';
+                    if (step4Indicator) step4Indicator.style.display = 'flex';
+                    if (step4Line) step4Line.style.display = 'block';
+                } else {
+                    if (step3Indicator) step3Indicator.style.display = 'none';
+                    if (step3Line) step3Line.style.display = 'none';
+                    if (step4Indicator) step4Indicator.style.display = 'none';
+                    if (step4Line) step4Line.style.display = 'none';
+                }
+            }
+            
+            // Move to next step
+            currentStepEl.classList.remove('active');
+            const currentIndicator = document.querySelector(`.step-indicator[data-step="${currentStep}"]`);
+            currentIndicator.classList.remove('active');
+            currentIndicator.classList.add('completed');
+            
+            // Determine next step
+            if (currentStep === 2 && !isProfessional) {
+                // Cliente: submit form
+                document.getElementById('registerForm').dispatchEvent(new Event('submit'));
+                return;
+            }
+            
+            currentStep++;
+            document.querySelector(`.form-step[data-step="${currentStep}"]`).classList.add('active');
+            document.querySelector(`.step-indicator[data-step="${currentStep}"]`).classList.add('active');
+            
+            // Scroll to top
+            document.querySelector('.modal-body').scrollTop = 0;
+        }
+        
+        function prevStep(e) {
+            if (e) e.preventDefault();
+            
+            const currentStepEl = document.querySelector(`.form-step[data-step="${currentStep}"]`);
+            currentStepEl.classList.remove('active');
+            document.querySelector(`.step-indicator[data-step="${currentStep}"]`).classList.remove('active');
+            
+            currentStep--;
+            document.querySelector(`.form-step[data-step="${currentStep}"]`).classList.add('active');
+            const prevIndicator = document.querySelector(`.step-indicator[data-step="${currentStep}"]`);
+            prevIndicator.classList.add('active');
+            prevIndicator.classList.remove('completed');
+            
+            // Scroll to top
+            document.querySelector('.modal-body').scrollTop = 0;
+        }
+        
+        // ============================================
+        // SERVICE SELECTION
+        // ============================================
+        
+        function toggleService(card, serviceName) {
+            card.classList.toggle('selected');
+            const checkbox = card.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+        }
+        
+        // ============================================
+        // WORKING HOURS
+        // ============================================
+        
+        function toggleAllDays() {
+            const dayToggles = document.querySelectorAll('.day-toggle');
+            const allChecked = Array.from(dayToggles).every(toggle => toggle.checked);
+            
+            dayToggles.forEach(toggle => {
+                toggle.checked = !allChecked;
+                toggle.dispatchEvent(new Event('change'));
+            });
+        }
+        
+        // Day toggle event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            const dayToggles = document.querySelectorAll('.day-toggle');
+            
+            dayToggles.forEach(toggle => {
+                toggle.addEventListener('change', function() {
+                    const dayCard = this.closest('.day-card');
+                    const timeInputs = dayCard.querySelector('.time-inputs');
+                    
+                    if (this.checked) {
+                        timeInputs.style.display = 'grid';
+                        dayCard.classList.remove('inactive');
+                        dayCard.classList.add('active');
+                        // Make time inputs required when day is checked
+                        timeInputs.querySelectorAll('input[type="time"]').forEach(input => {
+                            input.required = true;
+                        });
+                    } else {
+                        timeInputs.style.display = 'none';
+                        dayCard.classList.remove('active');
+                        dayCard.classList.add('inactive');
+                        // Remove required when day is unchecked
+                        timeInputs.querySelectorAll('input[type="time"]').forEach(input => {
+                            input.required = false;
+                        });
+                    }
+                });
+            });
+        });
+        
+        // ============================================
+        // FORM SUBMISSIONS
+        // ============================================
+        
         // Login Form
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -906,12 +2116,23 @@
                 showToast(error.response?.data?.message || 'Erro ao fazer login. Verifique suas credenciais.', 'danger');
             }
         });
-
+        
         // Register Form
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData);
+            const data = {};
+            
+            // Convert FormData to object
+            for (let [key, value] of formData.entries()) {
+                if (key.endsWith('[]')) {
+                    const cleanKey = key.replace('[]', '');
+                    if (!data[cleanKey]) data[cleanKey] = [];
+                    data[cleanKey].push(value);
+                } else {
+                    data[key] = value;
+                }
+            }
             
             if (!data.userType) {
                 showToast('Por favor, selecione o tipo de conta', 'warning');
@@ -930,22 +2151,45 @@
                         new bootstrap.Modal(document.getElementById('loginModal')).show();
                     }, 500);
                     e.target.reset();
+                    // Reset wizard
+                    resetWizard();
                 }
             } catch (error) {
                 hideLoading();
                 showToast(error.response?.data?.message || 'Erro ao cadastrar. Tente novamente.', 'danger');
             }
         });
-
-        // Open login modal from navbar
-        document.querySelectorAll('[href="/cliente"]').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                if (!btn.classList.contains('btn-primary')) {
-                    e.preventDefault();
-                    new bootstrap.Modal(document.getElementById('loginModal')).show();
-                }
+        
+        // Reset wizard
+        function resetWizard() {
+            currentStep = 1;
+            isProfessional = false;
+            document.querySelectorAll('.form-step').forEach(step => step.classList.remove('active'));
+            document.querySelectorAll('.step-indicator').forEach(step => {
+                step.classList.remove('active', 'completed');
             });
+            document.querySelector('.form-step[data-step="1"]').classList.add('active');
+            document.querySelector('.step-indicator[data-step="1"]').classList.add('active');
+            document.querySelectorAll('.account-type-card').forEach(card => card.classList.remove('selected'));
+            document.querySelectorAll('.service-card').forEach(card => card.classList.remove('selected'));
+        }
+        
+        // Pre-select professional type when clicking "Sou Profissional"
+        document.querySelectorAll('[data-professional="true"]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                setTimeout(() => {
+                    selectAccountType('profissional');
+                    document.getElementById('typeProfissional').checked = true;
+                }, 300);
+            });
+        });
+        
+        // Reset wizard when modal closes
+        document.getElementById('registerModal').addEventListener('hidden.bs.modal', function () {
+            resetWizard();
+            document.getElementById('registerForm').reset();
         });
     </script>
 </body>
 </html>
+

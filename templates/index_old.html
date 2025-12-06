@@ -1,0 +1,1646 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Groomly - Plataforma inteligente de agendamento para estúdios de beleza">
+    <title>Groomly - Agendamento Inteligente para Beleza</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- AOS Animation -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --secondary: #14b8a6;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --black: #0a0a0a;
+        }
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            overflow-x: hidden;
+            background: var(--light);
+        }
+        
+        /* Navbar */
+        .navbar {
+            padding: 1.5rem 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+        }
+        
+        .navbar.scrolled {
+            padding: 1rem 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .nav-link {
+            color: var(--gray);
+            font-weight: 500;
+            padding: 0.5rem 1rem !important;
+            transition: color 0.3s;
+        }
+        
+        .nav-link:hover {
+            color: var(--primary);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+        }
+        
+        .btn-outline-primary {
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        
+        .btn-outline-primary:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        /* Hero Section */
+        .hero {
+            padding: 120px 0 80px;
+            background: #0a0a0a;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 2rem;
+        }
+        
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 900;
+            line-height: 1.1;
+            color: #ffffff;
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero h1 .gradient-text {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero p.lead {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 2.5rem;
+            line-height: 1.8;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .hero-image {
+            position: relative;
+        }
+        
+        .hero-image img {
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Stats */
+        .stats {
+            padding: 60px 0;
+            background: white;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: var(--gray);
+            font-weight: 500;
+        }
+        
+        /* Features */
+        .features {
+            padding: 100px 0;
+            background: var(--light);
+        }
+        
+        .section-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 1rem;
+        }
+        
+        .section-subtitle {
+            font-size: 1.125rem;
+            color: var(--gray);
+            margin-bottom: 4rem;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            height: 100%;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .feature-icon i {
+            font-size: 1.75rem;
+            color: white;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 1rem;
+        }
+        
+        .feature-card p {
+            color: var(--gray);
+            line-height: 1.7;
+            margin: 0;
+        }
+        
+        /* How It Works */
+        .how-it-works {
+            padding: 100px 0;
+            background: white;
+        }
+        
+        .step-card {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: white;
+        }
+        
+        .step-card h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 1rem;
+        }
+        
+        .step-card p {
+            color: var(--gray);
+            line-height: 1.7;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            padding: 100px 0;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="2" fill="white" opacity="0.1"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .cta-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            color: white;
+        }
+        
+        .cta-content h2 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+        }
+        
+        .cta-content p {
+            font-size: 1.25rem;
+            margin-bottom: 2.5rem;
+            opacity: 0.9;
+        }
+        
+        .btn-light {
+            background: white;
+            color: var(--primary);
+            padding: 1rem 2.5rem;
+            font-weight: 700;
+            border-radius: 10px;
+            border: none;
+            transition: all 0.3s;
+        }
+        
+        .btn-light:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            color: var(--primary);
+        }
+        
+        /* Footer */
+        .footer {
+            padding: 60px 0 30px;
+            background: var(--dark);
+            color: white;
+        }
+        
+        .footer-brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+        
+        .footer-links {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .footer-links li {
+            margin-bottom: 0.75rem;
+        }
+        
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        .footer-bottom {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        /* Wizard Steps */
+        .step-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0.5;
+            transition: all 0.3s;
+        }
+        
+        .step-indicator.active {
+            opacity: 1;
+        }
+        
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+        
+        .step-indicator.active .step-circle {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .step-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.75rem;
+        }
+        
+        .step-line {
+            flex: 1;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.2);
+            margin: 0 1rem;
+        }
+        
+        .form-step {
+            display: none;
+        }
+        
+        .form-step.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        /* Day Card Styles */
+        .day-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .day-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+        
+        .time-inputs {
+            transition: all 0.3s ease;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero p.lead {
+                font-size: 1.125rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+            }
+            
+            .hero-buttons .btn {
+                width: 100%;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .cta-content h2 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <div class="brand-icon">
+                    <i class="bi bi-scissors"></i>
+                </div>
+                <span>Groomly</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Recursos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#how-it-works">Como Funciona</a>
+                    </li>
+                    <li class="nav-item ms-3">
+                        <a href="#" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#loginModal">Entrar</a>
+                    </li>
+                    <li class="nav-item ms-2">
+                        <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerModal" data-professional="true">Sou Profissional</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6" data-aos="fade-right">
+                    <div class="hero-content">
+                        <div class="hero-badge">
+                            <i class="bi bi-stars"></i>
+                            <span>Plataforma #1 em Agendamento de Beleza</span>
+                        </div>
+                        <h1>
+                            Transforme Seu <span class="gradient-text">Estúdio de Beleza</span> com Tecnologia
+                        </h1>
+                        <p class="lead">
+                            Gerencie agendamentos, clientes e pagamentos em uma única plataforma inteligente. Aumente sua produtividade em até 300%.
+                        </p>
+                        <div class="hero-buttons">
+                            <a href="#" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#registerModal"></a>
+                                <i class="bi bi-rocket-takeoff"></i> Começar Agora
+                            </a>
+                            <a href="#how-it-works" class="btn btn-outline-primary btn-lg">
+                                <i class="bi bi-play-circle"></i> Ver Como Funciona
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6" data-aos="fade-left" data-aos-delay="200">
+                    <div class="hero-image">
+                        <img src="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&q=80" alt="Groomly Dashboard" class="img-fluid">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="stats">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3 col-6" data-aos="fade-up">
+                    <div class="stat-item">
+                        <div class="stat-number">10k+</div>
+                        <div class="stat-label">Profissionais</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="100">
+                    <div class="stat-item">
+                        <div class="stat-number">500k+</div>
+                        <div class="stat-label">Agendamentos</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="200">
+                    <div class="stat-item">
+                        <div class="stat-number">4.9</div>
+                        <div class="stat-label">Avaliação</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="300">
+                    <div class="stat-item">
+                        <div class="stat-number">24/7</div>
+                        <div class="stat-label">Suporte</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="text-center" data-aos="fade-up">
+                <span class="section-badge">Recursos</span>
+                <h2 class="section-title">Tudo que Você Precisa em Um Só Lugar</h2>
+                <p class="section-subtitle">Ferramentas profissionais para gerenciar seu negócio de beleza</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                        <h3>Agendamento Inteligente</h3>
+                        <p>Sistema de agendamento online 24/7 com confirmação automática e lembretes por SMS e email.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <h3>Gestão de Clientes</h3>
+                        <p>Histórico completo, preferências e análise de comportamento para atendimento personalizado.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-graph-up"></i>
+                        </div>
+                        <h3>Analytics Avançado</h3>
+                        <p>Dashboards com métricas em tempo real para tomar decisões baseadas em dados.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-chat-dots"></i>
+                        </div>
+                        <h3>Chat em Tempo Real</h3>
+                        <p>Comunicação instantânea entre profissionais e clientes para melhor experiência.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-star"></i>
+                        </div>
+                        <h3>Sistema de Avaliações</h3>
+                        <p>Colete feedback dos clientes e construa sua reputação online automaticamente.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-robot"></i>
+                        </div>
+                        <h3>IA & Recomendações</h3>
+                        <p>Inteligência artificial para sugerir horários e serviços baseados em padrões.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <div class="text-center" data-aos="fade-up">
+                <span class="section-badge">Como Funciona</span>
+                <h2 class="section-title">Comece em 3 Passos Simples</h2>
+                <p class="section-subtitle">Configure sua conta e comece a receber agendamentos em minutos</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <h3>Crie Sua Conta</h3>
+                        <p>Cadastre-se gratuitamente e configure seu perfil profissional em menos de 5 minutos.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <h3>Configure Seus Serviços</h3>
+                        <p>Adicione seus serviços, preços e horários de disponibilidade de forma simples.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <h3>Receba Agendamentos</h3>
+                        <p>Compartilhe seu link e comece a receber agendamentos automaticamente.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content" data-aos="zoom-in">
+                <h2>Pronto Para Transformar Seu Negócio?</h2>
+                <p>Junte-se a milhares de profissionais que já usam o Groomly</p>
+                <a href="#" class="btn btn-light btn-lg" data-bs-toggle="modal" data-bs-target="#registerModal"></a>
+                    <i class="bi bi-rocket-takeoff"></i> Começar Gratuitamente
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <div class="footer-brand">Groomly</div>
+                    <p class="text-white-50">Plataforma inteligente de agendamento para estúdios de beleza.</p>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h5>Produto</h5>
+                    <ul class="footer-links">
+                        <li><a href="#features">Recursos</a></li>
+                        <li><a href="#how-it-works">Como Funciona</a></li>
+                        <li><a href="#">Integrações</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h5>Empresa</h5>
+                    <ul class="footer-links">
+                        <li><a href="#">Sobre</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Carreiras</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h5>Suporte</h5>
+                    <ul class="footer-links">
+                        <li><a href="#">Central de Ajuda</a></li>
+                        <li><a href="#">Contato</a></li>
+                        <li><a href="#">Status</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h5>Legal</h5>
+                    <ul class="footer-links">
+                        <li><a href="#">Privacidade</a></li>
+                        <li><a href="#">Termos</a></li>
+                        <li><a href="#">Cookies</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Groomly. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal - Fullscreen -->
+    <div class="modal fade" id="loginModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content bg-dark">
+                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-4" data-bs-dismiss="modal" style="z-index: 1050;"></button>
+                
+                <div class="modal-body p-0">
+                    <div class="container-fluid h-100">
+                        <div class="row h-100">
+                            <!-- Left Side - Image/Branding -->
+                            <div class="col-lg-6 d-none d-lg-flex align-items-center justify-content-center bg-gradient p-5" style="background: linear-gradient(135deg, var(--primary), var(--primary-dark));">
+                                <div class="text-center text-white">
+                                    <div class="mb-4">
+                                        <div class="brand-icon mx-auto mb-4" style="width: 80px; height: 80px; font-size: 2.5rem;">
+                                            <i class="bi bi-scissors"></i>
+                                        </div>
+                                        <h2 class="display-4 fw-bold mb-3">Bem-vindo de volta!</h2>
+                                        <p class="lead opacity-90">Acesse sua conta e continue gerenciando seus agendamentos</p>
+                                    </div>
+                                    <div class="mt-5">
+                                        <div class="d-flex align-items-center justify-content-center gap-4 mb-4">
+                                            <div class="text-center">
+                                                <h3 class="fw-bold mb-0">10k+</h3>
+                                                <small class="opacity-75">Profissionais</small>
+                                            </div>
+                                            <div class="text-center">
+                                                <h3 class="fw-bold mb-0">500k+</h3>
+                                                <small class="opacity-75">Agendamentos</small>
+                                            </div>
+                                            <div class="text-center">
+                                                <h3 class="fw-bold mb-0">4.9</h3>
+                                                <small class="opacity-75">Avaliação</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Right Side - Form -->
+                            <div class="col-lg-6 d-flex align-items-center justify-content-center p-5">
+                                <div class="w-100" style="max-width: 450px;">
+                                    <div class="text-white mb-5">
+                                        <h1 class="display-5 fw-bold mb-2">Entrar</h1>
+                                        <p class="text-white-50">Digite suas credenciais para acessar</p>
+                                    </div>
+                                    
+                                    <form id="loginForm">
+                                        <div class="mb-4">
+                                            <label class="form-label text-white fw-semibold mb-2">Email</label>
+                                            <input type="email" class="form-control form-control-lg bg-dark text-white border-secondary" name="email" placeholder="seu@email.com" required style="padding: 1rem;">
+                                        </div>
+                                        
+                                        <div class="mb-4">
+                                            <label class="form-label text-white fw-semibold mb-2">Senha</label>
+                                            <input type="password" class="form-control form-control-lg bg-dark text-white border-secondary" name="password" placeholder="••••••••" required style="padding: 1rem;">
+                                        </div>
+                                        
+                                        <button type="submit" class="btn btn-primary btn-lg w-100 py-3 mb-4">
+                                            <i class="bi bi-box-arrow-in-right"></i> Entrar na Conta
+                                        </button>
+                                        
+                                        <div class="text-center">
+                                            <p class="text-white-50 mb-0">
+                                                Não tem uma conta? 
+                                                <a href="#" class="text-primary fw-semibold text-decoration-none" data-bs-toggle="modal" data-bs-target="#registerModal" data-bs-dismiss="modal">
+                                                    Cadastre-se gratuitamente
+                                                </a>
+                                            </p>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal - Fullscreen -->
+    <div class="modal fade" id="registerModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content bg-dark">
+                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-4" data-bs-dismiss="modal" style="z-index: 1050;"></button>
+                
+                <div class="modal-body p-0">
+                    <div class="container-fluid h-100">
+                        <div class="row h-100">
+                            <!-- Left Side - Image/Branding -->
+                            <div class="col-lg-6 d-none d-lg-flex align-items-center justify-content-center bg-gradient p-5" style="background: linear-gradient(135deg, var(--primary), var(--primary-dark));">
+                                <div class="text-center text-white">
+                                    <div class="mb-4">
+                                        <div class="brand-icon mx-auto mb-4" style="width: 80px; height: 80px; font-size: 2.5rem;">
+                                            <i class="bi bi-scissors"></i>
+                                        </div>
+                                        <h2 class="display-4 fw-bold mb-3">Junte-se ao Groomly</h2>
+                                        <p class="lead opacity-90">Crie sua conta e comece a transformar seu negócio de beleza hoje mesmo</p>
+                                    </div>
+                                    <div class="mt-5">
+                                        <div class="row g-4">
+                                            <div class="col-12">
+                                                <div class="d-flex align-items-center gap-3 p-3 rounded" style="background: rgba(255,255,255,0.1);">
+                                                    <i class="bi bi-check-circle-fill fs-3"></i>
+                                                    <div class="text-start">
+                                                        <div class="fw-bold">Grátis para começar</div>
+                                                        <small class="opacity-75">Sem cartão de crédito</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="d-flex align-items-center gap-3 p-3 rounded" style="background: rgba(255,255,255,0.1);">
+                                                    <i class="bi bi-shield-check fs-3"></i>
+                                                    <div class="text-start">
+                                                        <div class="fw-bold">100% Seguro</div>
+                                                        <small class="opacity-75">Seus dados protegidos</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="d-flex align-items-center gap-3 p-3 rounded" style="background: rgba(255,255,255,0.1);">
+                                                    <i class="bi bi-lightning-charge-fill fs-3"></i>
+                                                    <div class="text-start">
+                                                        <div class="fw-bold">Configuração rápida</div>
+                                                        <small class="opacity-75">Pronto em 2 minutos</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Right Side - Form -->
+                            <div class="col-lg-6 d-flex align-items-center justify-content-center p-5">
+                                <div class="w-100" style="max-width: 450px;">
+                                    <div class="text-white mb-4">
+                                        <h1 class="display-5 fw-bold mb-2">Criar Conta</h1>
+                                        <p class="text-white-50">Preencha os dados abaixo para começar</p>
+                                    </div>
+                                    
+                                    <form id="registerForm">
+                                        <!-- Progress Steps -->
+                                        <div class="mb-4" id="progressSteps">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <div class="step-indicator active" data-step="1">
+                                                    <div class="step-circle">1</div>
+                                                    <small class="step-label">Tipo</small>
+                                                </div>
+                                                <div class="step-line"></div>
+                                                <div class="step-indicator" data-step="2">
+                                                    <div class="step-circle">2</div>
+                                                    <small class="step-label">Dados</small>
+                                                </div>
+                                                <div class="step-line" id="step3Line" style="display: none;"></div>
+                                                <div class="step-indicator" data-step="3" id="step3Indicator" style="display: none;">
+                                                    <div class="step-circle">3</div>
+                                                    <small class="step-label">Serviços</small>
+                                                </div>
+                                                <div class="step-line" id="step4Line" style="display: none;"></div>
+                                                <div class="step-indicator" data-step="4" id="step4Indicator" style="display: none;">
+                                                    <div class="step-circle">4</div>
+                                                    <small class="step-label">Horários</small>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Step 1: Account Type -->
+                                        <div class="form-step active" data-step="1">
+                                            <div class="mb-4">
+                                                <label class="form-label text-white fw-semibold mb-3">Tipo de Conta</label>
+                                                <div class="row g-3">
+                                                    <div class="col-6">
+                                                        <input type="radio" class="btn-check" name="userType" id="typeCliente" value="cliente" required>
+                                                        <label class="btn btn-outline-primary w-100 py-3" for="typeCliente">
+                                                            <i class="bi bi-person-circle d-block fs-3 mb-2"></i>
+                                                            <div class="fw-semibold">Cliente</div>
+                                                            <small class="d-block opacity-75">Agendar serviços</small>
+                                                        </label>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <input type="radio" class="btn-check" name="userType" id="typeProfissional" value="profissional" required>
+                                                        <label class="btn btn-outline-primary w-100 py-3" for="typeProfissional">
+                                                            <i class="bi bi-briefcase d-block fs-3 mb-2"></i>
+                                                            <div class="fw-semibold">Profissional</div>
+                                                            <small class="d-block opacity-75">Oferecer serviços</small>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn btn-primary btn-lg w-100 py-3" onclick="nextStep()">
+                                                Continuar <i class="bi bi-arrow-right"></i>
+                                            </button>
+                                        </div>
+
+                                        <!-- Step 2: Basic Info -->
+                                        <div class="form-step" data-step="2">
+                                            <div class="mb-3">
+                                                <label class="form-label text-white fw-semibold">Nome Completo</label>
+                                                <input type="text" class="form-control form-control-lg bg-dark text-white border-secondary" name="name" placeholder="Seu nome completo" required>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label class="form-label text-white fw-semibold">Email</label>
+                                                <input type="email" class="form-control form-control-lg bg-dark text-white border-secondary" name="email" placeholder="seu@email.com" required>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label class="form-label text-white fw-semibold">Telefone</label>
+                                                <input type="tel" class="form-control form-control-lg bg-dark text-white border-secondary" name="phone" placeholder="(11) 98765-4321" required>
+                                            </div>
+                                            
+                                            <div class="mb-4">
+                                                <label class="form-label text-white fw-semibold">Senha</label>
+                                                <input type="password" class="form-control form-control-lg bg-dark text-white border-secondary" name="password" placeholder="Mínimo 6 caracteres" required minlength="6">
+                                                <small class="text-white-50">Use pelo menos 6 caracteres</small>
+                                            </div>
+                                            
+                                            <div class="d-flex gap-2">
+                                                <button type="button" class="btn btn-outline-secondary btn-lg py-3" onclick="prevStep()">
+                                                    <i class="bi bi-arrow-left"></i> Voltar
+                                                </button>
+                                                <button type="button" class="btn btn-primary btn-lg flex-fill py-3" onclick="nextStep()">
+                                                    Continuar <i class="bi bi-arrow-right"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Step 3: Services (Professional Only) -->
+                                        <div class="form-step" data-step="3">
+                                            <div class="mb-4">
+                                                <label class="form-label text-white fw-semibold mb-3">Categoria Profissional</label>
+                                                <select class="form-select form-select-lg bg-dark text-white border-secondary" name="categoria" required>
+                                                    <option value="">Selecione sua especialidade...</option>
+                                                    <option value="Cabeleireiro">💇 Cabeleireiro(a)</option>
+                                                    <option value="Manicure">💅 Manicure</option>
+                                                    <option value="Pedicure">🦶 Pedicure</option>
+                                                    <option value="Esteticista">✨ Esteticista</option>
+                                                    <option value="Maquiador">💄 Maquiador(a)</option>
+                                                    <option value="Barbeiro">✂️ Barbeiro</option>
+                                                    <option value="Depilador">🪒 Depilador(a)</option>
+                                                    <option value="Massagista">💆 Massagista</option>
+                                                    <option value="Designer de Sobrancelhas">👁️ Designer de Sobrancelhas</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="mb-4">
+                                                <label class="form-label text-white fw-semibold mb-3">Serviços Oferecidos</label>
+                                                <small class="text-white-50 d-block mb-3">Selecione todos os serviços que você oferece</small>
+                                                <div class="row g-3">
+                                                    <div class="col-md-6">
+                                                        <input type="checkbox" class="btn-check" name="servicos[]" value="Corte de Cabelo" id="servCorte">
+                                                        <label class="btn btn-outline-primary w-100 text-start p-3" for="servCorte">
+                                                            <i class="bi bi-scissors fs-4 me-2"></i>
+                                                            <div class="d-inline-block">
+                                                                <div class="fw-semibold">Corte de Cabelo</div>
+                                                                <small class="text-white-50">Cortes masculinos e femininos</small>
+                                                            </div>
+                                                        </label>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <input type="checkbox" class="btn-check" name="servicos[]" value="Coloração" id="servColor">
+                                                        <label class="btn btn-outline-primary w-100 text-start p-3" for="servColor">
+                                                            <i class="bi bi-palette fs-4 me-2"></i>
+                                                            <div class="d-inline-block">
+                                                                <div class="fw-semibold">Coloração</div>
+                                                                <small class="text-white-50">Tintura e mechas</small>
+                                                            </div>
+                                                        </label>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <input type="checkbox" class="btn-check" name="servicos[]" value="Manicure" id="servMani">
+                                                        <label class="btn btn-outline-primary w-100 text-start p-3" for="servMani">
+                                                            <i class="bi bi-hand-index fs-4 me-2"></i>
+                                                            <div class="d-inline-block">
+                                                                <div class="fw-semibold">Manicure</div>
+                                                                <small class="text-white-50">Cuidados com as unhas</small>
+                                                            </div>
+                                                        </label>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <input type="checkbox" class="btn-check" name="servicos[]" value="Pedicure" id="servPedi">
+                                                        <label class="btn btn-outline-primary w-100 text-start p-3" for="servPedi">
+                                                            <i class="bi bi-heart-pulse fs-4 me-2"></i>
+                                                            <div class="d-inline-block">
+                                                                <div class="fw-semibold">Pedicure</div>
+                                                                <small class="text-white-50">Cuidados com os pés</small>
+                                                            </div>
+                                                        </label>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <input type="checkbox" class="btn-check" name="servicos[]" value="Maquiagem" id="servMake">
+                                                        <label class="btn btn-outline-primary w-100 text-start p-3" for="servMake">
+                                                            <i class="bi bi-brush fs-4 me-2"></i>
+                                                            <div class="d-inline-block">
+                                                                <div class="fw-semibold">Maquiagem</div>
+                                                                <small class="text-white-50">Social, noiva, artística</small>
+                                                            </div>
+                                                        </label>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <input type="checkbox" class="btn-check" name="servicos[]" value="Barba" id="servBarba">
+                                                        <label class="btn btn-outline-primary w-100 text-start p-3" for="servBarba">
+                                                            <i class="bi bi-person fs-4 me-2"></i>
+                                                            <div class="d-inline-block">
+                                                                <div class="fw-semibold">Barba</div>
+                                                                <small class="text-white-50">Aparar e modelar</small>
+                                                            </div>
+                                                        </label>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <input type="checkbox" class="btn-check" name="servicos[]" value="Depilação" id="servDepil">
+                                                        <label class="btn btn-outline-primary w-100 text-start p-3" for="servDepil">
+                                                            <i class="bi bi-stars fs-4 me-2"></i>
+                                                            <div class="d-inline-block">
+                                                                <div class="fw-semibold">Depilação</div>
+                                                                <small class="text-white-50">Cera e laser</small>
+                                                            </div>
+                                                        </label>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <input type="checkbox" class="btn-check" name="servicos[]" value="Massagem" id="servMass">
+                                                        <label class="btn btn-outline-primary w-100 text-start p-3" for="servMass">
+                                                            <i class="bi bi-heart fs-4 me-2"></i>
+                                                            <div class="d-inline-block">
+                                                                <div class="fw-semibold">Massagem</div>
+                                                                <small class="text-white-50">Relaxante e terapêutica</small>
+                                                            </div>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="d-flex gap-2">
+                                                <button type="button" class="btn btn-outline-secondary btn-lg py-3" onclick="prevStep()">
+                                                    <i class="bi bi-arrow-left"></i> Voltar
+                                                </button>
+                                                <button type="button" class="btn btn-primary btn-lg flex-fill py-3" onclick="nextStep()">
+                                                    Continuar <i class="bi bi-arrow-right"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Step 4: Working Hours (Professional Only) -->
+                                        <div class="form-step" data-step="4">
+                                            <div class="mb-4">
+                                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                                    <div>
+                                                        <label class="form-label text-white fw-semibold mb-1">Horários de Atendimento</label>
+                                                        <small class="text-white-50 d-block">Desmarque os dias em que você não trabalha</small>
+                                                    </div>
+                                                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="toggleAllDays()">
+                                                        <i class="bi bi-check-all"></i> Marcar/Desmarcar Todos
+                                                    </button>
+                                                </div>
+                                                
+                                                <div class="row g-3">
+                                                    <!-- Segunda -->
+                                                    <div class="col-12">
+                                                        <div class="day-card p-3 rounded" data-day="seg">
+                                                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                                                <div class="form-check form-switch">
+                                                                    <input class="form-check-input day-toggle" type="checkbox" name="dias[]" value="1" id="diaSeg" checked>
+                                                                    <label class="form-check-label text-white fw-semibold fs-5" for="diaSeg">
+                                                                        <i class="bi bi-calendar-day me-2"></i>Segunda-feira
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                            <div class="time-inputs">
+                                                                <div class="row g-2">
+                                                                    <div class="col-6">
+                                                                        <label class="text-white-50 small">Abertura</label>
+                                                                        <input type="time" class="form-control bg-dark text-white border-secondary" name="seg_inicio" value="09:00">
+                                                                    </div>
+                                                                    <div class="col-6">
+                                                                        <label class="text-white-50 small">Fechamento</label>
+                                                                        <input type="time" class="form-control bg-dark text-white border-secondary" name="seg_fim" value="18:00">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Terça -->
+                                                    <div class="col-12">
+                                                        <div class="day-card p-3 rounded" data-day="ter">
+                                                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                                                <div class="form-check form-switch">
+                                                                    <input class="form-check-input day-toggle" type="checkbox" name="dias[]" value="2" id="diaTer" checked>
+                                                                    <label class="form-check-label text-white fw-semibold fs-5" for="diaTer">
+                                                                        <i class="bi bi-calendar-day me-2"></i>Terça-feira
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                            <div class="time-inputs">
+                                                                <div class="row g-2">
+                                                                    <div class="col-6">
+                                                                        <label class="text-white-50 small">Abertura</label>
+                                                                        <input type="time" class="form-control bg-dark text-white border-secondary" name="ter_inicio" value="09:00">
+                                                                    </div>
+                                                                    <div class="col-6">
+                                                                        <label class="text-white-50 small">Fechamento</label>
+                                                                        <input type="time" class="form-control bg-dark text-white border-secondary" name="ter_fim" value="18:00">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Quarta -->
+                                                    <div class="col-12">
+                                                        <div class="day-card p-3 rounded" data-day="qua">
+                                                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                                                <div class="form-check form-switch">
+                                                                    <input class="form-check-input day-toggle" type="checkbox" name="dias[]" value="3" id="diaQua" checked>
+                                                                    <label class="form-check-label text-white fw-semibold fs-5" for="diaQua">
+                                                                        <i class="bi bi-calendar-day me-2"></i>Quarta-feira
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                            <div class="time-inputs">
+                                                                <div class="row g-2">
+                                                                    <div class="col-6">
+                                                                        <label class="text-white-50 small">Abertura</label>
+                                                                        <input type="time" class="form-control bg-dark text-white border-secondary" name="qua_inicio" value="09:00">
+                                                                    </div>
+                                                                    <div class="col-6">
+                                                                        <label class="text-white-50 small">Fechamento</label>
+                                                                        <input type="time" class="form-control bg-dark text-white border-secondary" name="qua_fim" value="18:00">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Quinta -->
+                                                    <div class="col-12">
+                                                        <div class="day-card p-3 rounded" data-day="qui">
+                                                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                                                <div class="form-check form-switch">
+                                                                    <input class="form-check-input day-toggle" type="checkbox" name="dias[]" value="4" id="diaQui" checked>
+                                                                    <label class="form-check-label text-white fw-semibold fs-5" for="diaQui">
+                                                                        <i class="bi bi-calendar-day me-2"></i>Quinta-feira
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                            <div class="time-inputs">
+                                                                <div class="row g-2">
+                                                                    <div class="col-6">
+                                                                        <label class="text-white-50 small">Abertura</label>
+                                                                        <input type="time" class="form-control bg-dark text-white border-secondary" name="qui_inicio" value="09:00">
+                                                                    </div>
+                                                                    <div class="col-6">
+                                                                        <label class="text-white-50 small">Fechamento</label>
+                                                                        <input type="time" class="form-control bg-dark text-white border-secondary" name="qui_fim" value="18:00">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Sexta -->
+                                                    <div class="col-12">
+                                                        <div class="day-card p-3 rounded" data-day="sex">
+                                                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                                                <div class="form-check form-switch">
+                                                                    <input class="form-check-input day-toggle" type="checkbox" name="dias[]" value="5" id="diaSex" checked>
+                                                                    <label class="form-check-label text-white fw-semibold fs-5" for="diaSex">
+                                                                        <i class="bi bi-calendar-day me-2"></i>Sexta-feira
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                            <div class="time-inputs">
+                                                                <div class="row g-2">
+                                                                    <div class="col-6">
+                                                                        <label class="text-white-50 small">Abertura</label>
+                                                                        <input type="time" class="form-control bg-dark text-white border-secondary" name="sex_inicio" value="09:00">
+                                                                    </div>
+                                                                    <div class="col-6">
+                                                                        <label class="text-white-50 small">Fechamento</label>
+                                                                        <input type="time" class="form-control bg-dark text-white border-secondary" name="sex_fim" value="18:00">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Sábado -->
+                                                    <div class="col-12">
+                                                        <div class="day-card p-3 rounded" data-day="sab">
+                                                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                                                <div class="form-check form-switch">
+                                                                    <input class="form-check-input day-toggle" type="checkbox" name="dias[]" value="6" id="diaSab" checked>
+                                                                    <label class="form-check-label text-white fw-semibold fs-5" for="diaSab">
+                                                                        <i class="bi bi-calendar-day me-2"></i>Sábado
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                            <div class="time-inputs">
+                                                                <div class="row g-2">
+                                                                    <div class="col-6">
+                                                                        <label class="text-white-50 small">Abertura</label>
+                                                                        <input type="time" class="form-control bg-dark text-white border-secondary" name="sab_inicio" value="09:00">
+                                                                    </div>
+                                                                    <div class="col-6">
+                                                                        <label class="text-white-50 small">Fechamento</label>
+                                                                        <input type="time" class="form-control bg-dark text-white border-secondary" name="sab_fim" value="14:00">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Domingo -->
+                                                    <div class="col-12">
+                                                        <div class="day-card p-3 rounded" data-day="dom">
+                                                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                                                <div class="form-check form-switch">
+                                                                    <input class="form-check-input day-toggle" type="checkbox" name="dias[]" value="0" id="diaDom">
+                                                                    <label class="form-check-label text-white fw-semibold fs-5" for="diaDom">
+                                                                        <i class="bi bi-calendar-day me-2"></i>Domingo
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                            <div class="time-inputs" style="display: none;">
+                                                                <div class="row g-2">
+                                                                    <div class="col-6">
+                                                                        <label class="text-white-50 small">Abertura</label>
+                                                                        <input type="time" class="form-control bg-dark text-white border-secondary" name="dom_inicio" value="09:00">
+                                                                    </div>
+                                                                    <div class="col-6">
+                                                                        <label class="text-white-50 small">Fechamento</label>
+                                                                        <input type="time" class="form-control bg-dark text-white border-secondary" name="dom_fim" value="14:00">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="d-flex gap-2">
+                                                <button type="button" class="btn btn-outline-secondary btn-lg py-3" onclick="prevStep()">
+                                                    <i class="bi bi-arrow-left"></i> Voltar
+                                                </button>
+                                                <button type="submit" class="btn btn-primary btn-lg flex-fill py-3">
+                                                    <i class="bi bi-rocket-takeoff"></i> Criar Conta
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="text-center mt-4">
+                                            <p class="text-white-50 mb-0">
+                                                Já tem uma conta? 
+                                                <a href="#" class="text-primary fw-semibold text-decoration-none" data-bs-toggle="modal" data-bs-target="#loginModal" data-bs-dismiss="modal">
+                                                    Faça login
+                                                </a>
+                                            </p>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- AOS Animation -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <!-- Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            once: true,
+            offset: 100
+        });
+        
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Axios config
+        axios.defaults.withCredentials = true;
+
+        // Toast notification
+        function showToast(message, type = 'success') {
+            const toastContainer = document.querySelector('.toast-container');
+            const toastId = 'toast-' + Date.now();
+            
+            const bgColor = type === 'success' ? 'bg-success' : type === 'danger' ? 'bg-danger' : 'bg-warning';
+            
+            const toastHTML = `
+                <div id="${toastId}" class="toast align-items-center text-white ${bgColor} border-0" role="alert">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="bi bi-${type === 'success' ? 'check-circle' : type === 'danger' ? 'x-circle' : 'exclamation-circle'}"></i>
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            `;
+            
+            toastContainer.insertAdjacentHTML('beforeend', toastHTML);
+            const toastElement = document.getElementById(toastId);
+            const toast = new bootstrap.Toast(toastElement, { delay: 4000 });
+            toast.show();
+            
+            toastElement.addEventListener('hidden.bs.toast', () => {
+                toastElement.remove();
+            });
+        }
+
+        // Loading overlay
+        function showLoading() {
+            const overlay = document.createElement('div');
+            overlay.id = 'loadingOverlay';
+            overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:9999;';
+            overlay.innerHTML = '<div class="spinner-border text-light" style="width:3rem;height:3rem;"></div>';
+            document.body.appendChild(overlay);
+        }
+
+        function hideLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) overlay.remove();
+        }
+
+        // Login Form
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            
+            try {
+                showLoading();
+                const response = await axios.post('/api/users/login', data);
+                hideLoading();
+                
+                if (response.data.success) {
+                    showToast('Login realizado com sucesso!', 'success');
+                    setTimeout(() => {
+                        const userType = response.data.user.userType;
+                        window.location.href = userType === 'profissional' ? '/barbeiro' : '/cliente';
+                    }, 1000);
+                }
+            } catch (error) {
+                hideLoading();
+                showToast(error.response?.data?.message || 'Erro ao fazer login. Verifique suas credenciais.', 'danger');
+            }
+        });
+
+        // Wizard Navigation
+        let currentStep = 1;
+        let isProfessional = false;
+
+        function nextStep() {
+            const currentStepEl = document.querySelector(`.form-step[data-step="${currentStep}"]`);
+            
+            // Validate current step
+            const inputs = currentStepEl.querySelectorAll('input[required], select[required]');
+            let isValid = true;
+            
+            inputs.forEach(input => {
+                if (input.type === 'radio') {
+                    const radioGroup = currentStepEl.querySelectorAll(`input[name="${input.name}"]`);
+                    const isChecked = Array.from(radioGroup).some(radio => radio.checked);
+                    if (!isChecked) isValid = false;
+                } else if (!input.value) {
+                    isValid = false;
+                    input.classList.add('is-invalid');
+                } else {
+                    input.classList.remove('is-invalid');
+                }
+            });
+            
+            if (!isValid) {
+                showToast('Por favor, preencha todos os campos obrigatórios', 'warning');
+                return;
+            }
+            
+            // Check if professional
+            if (currentStep === 1) {
+                const userType = document.querySelector('input[name="userType"]:checked').value;
+                isProfessional = userType === 'profissional';
+                
+                // Show/hide professional steps
+                if (isProfessional) {
+                    document.getElementById('step3Indicator').style.display = 'flex';
+                    document.getElementById('step3Line').style.display = 'block';
+                    document.getElementById('step4Indicator').style.display = 'flex';
+                    document.getElementById('step4Line').style.display = 'block';
+                } else {
+                    document.getElementById('step3Indicator').style.display = 'none';
+                    document.getElementById('step3Line').style.display = 'none';
+                    document.getElementById('step4Indicator').style.display = 'none';
+                    document.getElementById('step4Line').style.display = 'none';
+                }
+            }
+            
+            // Move to next step
+            currentStepEl.classList.remove('active');
+            document.querySelector(`.step-indicator[data-step="${currentStep}"]`).classList.remove('active');
+            
+            // Determine next step
+            if (currentStep === 2 && !isProfessional) {
+                // Cliente: submit form
+                document.getElementById('registerForm').dispatchEvent(new Event('submit'));
+                return;
+            }
+            
+            currentStep++;
+            document.querySelector(`.form-step[data-step="${currentStep}"]`).classList.add('active');
+            document.querySelector(`.step-indicator[data-step="${currentStep}"]`).classList.add('active');
+        }
+
+        function prevStep() {
+            const currentStepEl = document.querySelector(`.form-step[data-step="${currentStep}"]`);
+            currentStepEl.classList.remove('active');
+            document.querySelector(`.step-indicator[data-step="${currentStep}"]`).classList.remove('active');
+            
+            currentStep--;
+            document.querySelector(`.form-step[data-step="${currentStep}"]`).classList.add('active');
+            document.querySelector(`.step-indicator[data-step="${currentStep}"]`).classList.add('active');
+        }
+
+        // Toggle all days on/off
+        function toggleAllDays() {
+            const dayToggles = document.querySelectorAll('.day-toggle');
+            const allChecked = Array.from(dayToggles).every(toggle => toggle.checked);
+            
+            dayToggles.forEach(toggle => {
+                toggle.checked = !allChecked;
+                // Trigger change event to show/hide time inputs
+                toggle.dispatchEvent(new Event('change'));
+            });
+        }
+
+        // Add event listeners for day toggles to show/hide time inputs
+        document.addEventListener('DOMContentLoaded', () => {
+            const dayToggles = document.querySelectorAll('.day-toggle');
+            
+            dayToggles.forEach(toggle => {
+                toggle.addEventListener('change', function() {
+                    const dayCard = this.closest('.day-card');
+                    const timeInputs = dayCard.querySelector('.time-inputs');
+                    
+                    if (this.checked) {
+                        timeInputs.style.display = 'block';
+                        dayCard.style.opacity = '1';
+                        // Make time inputs required when day is checked
+                        timeInputs.querySelectorAll('input[type="time"]').forEach(input => {
+                            input.required = true;
+                        });
+                    } else {
+                        timeInputs.style.display = 'none';
+                        dayCard.style.opacity = '0.6';
+                        // Remove required when day is unchecked
+                        timeInputs.querySelectorAll('input[type="time"]').forEach(input => {
+                            input.required = false;
+                        });
+                    }
+                });
+                
+                // Trigger initial state
+                toggle.dispatchEvent(new Event('change'));
+            });
+        });
+
+        // Register Form
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = {};
+            
+            // Convert FormData to object
+            for (let [key, value] of formData.entries()) {
+                if (key.endsWith('[]')) {
+                    const cleanKey = key.replace('[]', '');
+                    if (!data[cleanKey]) data[cleanKey] = [];
+                    data[cleanKey].push(value);
+                } else {
+                    data[key] = value;
+                }
+            }
+            
+            if (!data.userType) {
+                showToast('Por favor, selecione o tipo de conta', 'warning');
+                return;
+            }
+            
+            try {
+                showLoading();
+                const response = await axios.post('/api/users/register', data);
+                hideLoading();
+                
+                if (response.data.success) {
+                    showToast('Cadastro realizado com sucesso! Faça login para continuar.', 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('registerModal')).hide();
+                    setTimeout(() => {
+                        new bootstrap.Modal(document.getElementById('loginModal')).show();
+                    }, 500);
+                    e.target.reset();
+                    // Reset wizard
+                    currentStep = 1;
+                    document.querySelectorAll('.form-step').forEach(step => step.classList.remove('active'));
+                    document.querySelectorAll('.step-indicator').forEach(step => step.classList.remove('active'));
+                    document.querySelector('.form-step[data-step="1"]').classList.add('active');
+                    document.querySelector('.step-indicator[data-step="1"]').classList.add('active');
+                }
+            } catch (error) {
+                hideLoading();
+                showToast(error.response?.data?.message || 'Erro ao cadastrar. Tente novamente.', 'danger');
+            }
+        });
+
+        // Pre-select professional type when clicking "Sou Profissional"
+        document.querySelectorAll('[data-professional="true"]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                setTimeout(() => {
+                    document.getElementById('typeProfissional').checked = true;
+                }, 300);
+            });
+        });
+
+        // Reset wizard when modal closes
+        document.getElementById('registerModal').addEventListener('hidden.bs.modal', function () {
+            currentStep = 1;
+            isProfessional = false;
+            document.querySelectorAll('.form-step').forEach(step => step.classList.remove('active'));
+            document.querySelectorAll('.step-indicator').forEach(step => step.classList.remove('active'));
+            document.querySelector('.form-step[data-step="1"]').classList.add('active');
+            document.querySelector('.step-indicator[data-step="1"]').classList.add('active');
+            document.getElementById('registerForm').reset();
+        });
+
+        // Pre-select professional type when clicking "Sou Profissional"
+        document.querySelectorAll('[data-professional="true"]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                setTimeout(() => {
+                    document.getElementById('typeProfissional').checked = true;
+                }, 300);
+            });
+        });
+    </script>
+</body>
+</html>
