@@ -42,6 +42,20 @@
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
+.brand-logo-large {
+  display: flex;
+  align-items: center;
+  transition: transform 0.3s ease;
+}
+
+.brand-logo-large:hover {
+  transform: scale(1.05);
+}
+
+.brand-logo-large img {
+  filter: drop-shadow(0 2px 8px rgba(16, 185, 129, 0.3));
+}
+
 .brand-text {
   display: flex;
   flex-direction: column;

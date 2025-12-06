@@ -39,6 +39,9 @@ def api_login():
     if not usuario:
         return jsonify({"success": False, "message": "Credenciais inválidas"}), 401
 
+    # Log para debug
+    print(f"🔐 Login - Email: {email}, Tipo: {usuario['tipo']}")
+
     session["usuario_email"] = usuario["email"]
     session["usuario_nome"] = usuario["nome"]
     session["usuario_tipo"] = usuario["tipo"]
@@ -64,6 +67,13 @@ def api_register():
     password = (body.get("password") or "").strip()
     telefone = (body.get("phone") or "").strip()
     tipo = body.get("userType") or "cliente"
+    
+    # Campos específicos para profissionais
+    categoria = body.get("categoria")
+    servicos = body.get("servicos", [])
+    
+    # Log para debug
+    print(f"📝 Registro - Tipo: {tipo}, Categoria: {categoria}, Serviços: {servicos}")
 
     # Validações básicas
     if not all([nome, email, password]):
@@ -80,8 +90,15 @@ def api_register():
     # Validar senha
     if len(password) < 6:
         return jsonify({"success": False, "message": "Senha deve ter no mínimo 6 caracteres"}), 400
+    
+    # Validações específicas para profissionais
+    if tipo == "profissional":
+        if not categoria:
+            return jsonify({"success": False, "message": "Categoria é obrigatória para profissionais"}), 400
+        if not servicos or len(servicos) == 0:
+            return jsonify({"success": False, "message": "Selecione pelo menos um serviço"}), 400
 
-    if not register_user(nome, email, password, tipo, telefone):
+    if not register_user(nome, email, password, tipo, telefone, categoria, servicos):
         return jsonify({"success": False, "message": "Email já cadastrado"}), 400
     
     return jsonify({"success": True})

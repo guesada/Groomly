@@ -24,7 +24,7 @@ def barbeiro_dashboard():
     """Dashboard do barbeiro."""
     if not exigir_login("barbeiro"):
         return redirect(url_for("pages.index"))
-    return render_template("barbeiro_dashboard.html", nome=session.get("usuario_nome"))
+    return render_template("dashboard_profissional.html", nome=session.get("usuario_nome"))
 
 
 @pages_bp.route("/chat")

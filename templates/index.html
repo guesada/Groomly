@@ -65,8 +65,8 @@
         }
         
         .brand-icon {
-            width: 180px;
-            height: 50px;
+            width: 220px;
+            height: 65px;
             background: transparent;
             border-radius: 0;
             display: flex;
@@ -74,6 +74,11 @@
             justify-content: flex-start;
             padding: 0;
             overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        
+        .brand-icon:hover {
+            transform: scale(1.05);
         }
         
         .brand-icon img {
@@ -81,6 +86,7 @@
             height: 100%;
             object-fit: contain;
             object-position: left center;
+            filter: drop-shadow(0 2px 8px rgba(16, 185, 129, 0.3));
         }
         
         .nav-link {
@@ -1418,7 +1424,7 @@
                                                     <label class="form-label text-white fw-semibold mb-2">
                                                         <i class="bi bi-person me-2"></i>Nome Completo
                                                     </label>
-                                                    <input type="text" class="form-control-modern" name="nome" placeholder="Digite seu nome completo" required>
+                                                    <input type="text" class="form-control-modern" name="name" placeholder="Digite seu nome completo" required>
                                                 </div>
                                                 
                                                 <div class="col-md-6">
@@ -1432,7 +1438,7 @@
                                                     <label class="form-label text-white fw-semibold mb-2">
                                                         <i class="bi bi-phone me-2"></i>Telefone
                                                     </label>
-                                                    <input type="tel" class="form-control-modern" name="telefone" placeholder="(00) 00000-0000" required>
+                                                    <input type="tel" class="form-control-modern" name="phone" placeholder="(00) 00000-0000" required>
                                                 </div>
                                                 
                                                 <div class="col-md-6">
@@ -1881,6 +1887,11 @@
         let isProfessional = false;
         
         function selectAccountType(type, element) {
+            if (!element) {
+                console.error('Element is undefined in selectAccountType');
+                return;
+            }
+            
             // Remove selection from all cards
             document.querySelectorAll('.account-type-card').forEach(card => {
                 card.classList.remove('selected');
@@ -1891,7 +1902,8 @@
             
             // Check the radio button
             if (type === 'cliente') {
-                document.getElementById('typeCliente').checked = true;
+                const clienteRadio = document.getElementById('typeCliente');
+                if (clienteRadio) clienteRadio.checked = true;
                 isProfessional = false;
                 
                 // Hide professional steps (3 and 4)
@@ -1904,8 +1916,17 @@
                 if (step3Line) step3Line.style.display = 'none';
                 if (step4Indicator) step4Indicator.style.display = 'none';
                 if (step4Line) step4Line.style.display = 'none';
+                
+                // Remove required from professional fields
+                const categoriaSelect = document.querySelector('select[name="categoria"]');
+                if (categoriaSelect) categoriaSelect.removeAttribute('required');
+                
+                const servicosCheckboxes = document.querySelectorAll('input[name="servicos[]"]');
+                servicosCheckboxes.forEach(cb => cb.removeAttribute('required'));
+                
             } else {
-                document.getElementById('typeProfissional').checked = true;
+                const profissionalRadio = document.getElementById('typeProfissional');
+                if (profissionalRadio) profissionalRadio.checked = true;
                 isProfessional = true;
                 
                 // Show professional steps (3 and 4)
@@ -1918,6 +1939,10 @@
                 if (step3Line) step3Line.style.display = 'block';
                 if (step4Indicator) step4Indicator.style.display = 'flex';
                 if (step4Line) step4Line.style.display = 'block';
+                
+                // Add required to professional fields
+                const categoriaSelect = document.querySelector('select[name="categoria"]');
+                if (categoriaSelect) categoriaSelect.setAttribute('required', 'required');
             }
         }
         
@@ -1933,6 +1958,11 @@
             let isValid = true;
             
             inputs.forEach(input => {
+                // Skip validation for hidden or disabled fields
+                if (input.offsetParent === null || input.disabled) {
+                    return;
+                }
+                
                 if (input.type === 'radio') {
                     const radioGroup = currentStepEl.querySelectorAll(`input[name="${input.name}"]`);
                     const isChecked = Array.from(radioGroup).some(radio => radio.checked);
@@ -1975,7 +2005,13 @@
             
             // Handle step transitions
             if (currentStep === 1) {
-                const userType = document.querySelector('input[name="userType"]:checked').value;
+                const userTypeRadio = document.querySelector('input[name="userType"]:checked');
+                if (!userTypeRadio) {
+                    showToast('Selecione o tipo de conta', 'warning');
+                    return;
+                }
+                
+                const userType = userTypeRadio.value;
                 isProfessional = userType === 'profissional';
                 
                 // Show/hide professional steps
@@ -1989,11 +2025,22 @@
                     if (step3Line) step3Line.style.display = 'block';
                     if (step4Indicator) step4Indicator.style.display = 'flex';
                     if (step4Line) step4Line.style.display = 'block';
+                    
+                    // Add required to professional fields
+                    const categoriaSelect = document.querySelector('select[name="categoria"]');
+                    if (categoriaSelect) categoriaSelect.setAttribute('required', 'required');
                 } else {
                     if (step3Indicator) step3Indicator.style.display = 'none';
                     if (step3Line) step3Line.style.display = 'none';
                     if (step4Indicator) step4Indicator.style.display = 'none';
                     if (step4Line) step4Line.style.display = 'none';
+                    
+                    // Remove required from professional fields
+                    const categoriaSelect = document.querySelector('select[name="categoria"]');
+                    if (categoriaSelect) categoriaSelect.removeAttribute('required');
+                    
+                    const servicosCheckboxes = document.querySelectorAll('input[name="servicos[]"]');
+                    servicosCheckboxes.forEach(cb => cb.removeAttribute('required'));
                 }
             }
             
@@ -2108,7 +2155,8 @@
                     showToast('Login realizado com sucesso!', 'success');
                     setTimeout(() => {
                         const userType = response.data.user.userType;
-                        window.location.href = userType === 'profissional' ? '/barbeiro' : '/cliente';
+                        // Aceita tanto 'profissional' quanto 'barbeiro' para compatibilidade
+                        window.location.href = (userType === 'profissional' || userType === 'barbeiro') ? '/barbeiro' : '/cliente';
                     }, 1000);
                 }
             } catch (error) {
@@ -2139,23 +2187,51 @@
                 return;
             }
             
+            console.log('📝 Dados de registro:', data);
+            
             try {
                 showLoading();
                 const response = await axios.post('/api/users/register', data);
                 hideLoading();
                 
                 if (response.data.success) {
-                    showToast('Cadastro realizado com sucesso! Faça login para continuar.', 'success');
+                    showToast('Cadastro realizado com sucesso! Fazendo login...', 'success');
                     bootstrap.Modal.getInstance(document.getElementById('registerModal')).hide();
-                    setTimeout(() => {
-                        new bootstrap.Modal(document.getElementById('loginModal')).show();
-                    }, 500);
+                    
+                    // Fazer login automático
+                    try {
+                        showLoading();
+                        const loginResponse = await axios.post('/api/users/login', {
+                            email: data.email,
+                            password: data.password
+                        });
+                        hideLoading();
+                        
+                        if (loginResponse.data.success) {
+                            showToast('Login realizado com sucesso!', 'success');
+                            setTimeout(() => {
+                                const userType = loginResponse.data.user.userType;
+                                console.log('🔄 Redirecionando para:', userType);
+                                // Aceita tanto 'profissional' quanto 'barbeiro' para compatibilidade
+                                window.location.href = (userType === 'profissional' || userType === 'barbeiro') ? '/barbeiro' : '/cliente';
+                            }, 1000);
+                        }
+                    } catch (loginError) {
+                        hideLoading();
+                        console.error('Erro no login automático:', loginError);
+                        // Se falhar o login automático, mostrar modal de login
+                        setTimeout(() => {
+                            new bootstrap.Modal(document.getElementById('loginModal')).show();
+                        }, 500);
+                    }
+                    
                     e.target.reset();
                     // Reset wizard
                     resetWizard();
                 }
             } catch (error) {
                 hideLoading();
+                console.error('Erro no registro:', error);
                 showToast(error.response?.data?.message || 'Erro ao cadastrar. Tente novamente.', 'danger');
             }
         });

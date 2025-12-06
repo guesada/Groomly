@@ -1,35 +1,47 @@
 """Serviço de autenticação e autorização."""
 from flask import session
-from db import db, Cliente, Barber
+from db import db, Cliente, Professional
 from werkzeug.security import generate_password_hash, check_password_hash
+import json
 
 
 def authenticate_user(email, password):
-    """Autentica um usuário (cliente ou barbeiro)."""
+    """Autentica um usuário (cliente ou profissional)."""
     # Tentar como cliente
     cliente = Cliente.query.filter_by(email=email).first()
     if cliente and check_password_hash(cliente.senha, password):
         return {**cliente.to_dict(), "tipo": "cliente"}
     
-    # Tentar como barbeiro
-    barber = Barber.query.filter_by(email=email).first()
-    if barber and check_password_hash(barber.senha, password):
-        return {**barber.to_dict(), "tipo": "barbeiro"}
+    # Tentar como profissional
+    profissional = Professional.query.filter_by(email=email).first()
+    if profissional and check_password_hash(profissional.senha, password):
+        # Retornar como 'barbeiro' para compatibilidade com o frontend
+        return {**profissional.to_dict(), "tipo": "barbeiro"}
     
     return None
 
 
-def register_user(nome, email, password, tipo="cliente", telefone=None):
+def register_user(nome, email, password, tipo="cliente", telefone=None, categoria=None, servicos=None):
     """Registra um novo usuário."""
     # Verificar se email já existe
-    if Cliente.query.filter_by(email=email).first() or Barber.query.filter_by(email=email).first():
+    if Cliente.query.filter_by(email=email).first() or Professional.query.filter_by(email=email).first():
         return False
     
     senha_hash = generate_password_hash(password)
     
-    if tipo == "barbeiro":
-        user = Barber(nome=nome, email=email, senha=senha_hash, telefone=telefone)
+    if tipo in ["barbeiro", "profissional"]:
+        # Criar profissional
+        user = Professional(
+            nome=nome,
+            email=email,
+            senha=senha_hash,
+            telefone=telefone,
+            categoria=categoria or "Barbeiro",
+            especialidades=json.dumps(servicos or []),
+            ativo=True
+        )
     else:
+        # Criar cliente
         user = Cliente(nome=nome, email=email, senha=senha_hash, telefone=telefone)
     
     db.session.add(user)
@@ -57,7 +69,7 @@ def usuario_atual():
     tipo = session.get("usuario_tipo")
     
     if tipo == "barbeiro":
-        user = Barber.query.filter_by(email=email).first()
+        user = Professional.query.filter_by(email=email).first()
     else:
         user = Cliente.query.filter_by(email=email).first()
     
