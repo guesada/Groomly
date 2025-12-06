@@ -1,4 +1,4 @@
-# 💈 Corte Digital v2.0.0
+Groomly
 
 > Sistema profissional de agendamento para barbearias com IA integrada
 
