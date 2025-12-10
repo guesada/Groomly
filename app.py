@@ -42,15 +42,16 @@ app.config["SESSION_COOKIE_HTTPONLY"] = True  # Impede acesso aos cookies via Ja
 # Inicializa a conexão com o banco de dados e carrega dados iniciais
 services.init_app(app)
 
-# Cria tabelas do sistema
-try:
-    print("📊 Criando tabelas do sistema...")
-    chat_service.create_chat_tables()
-    notification_service.create_notifications_table()
-    review_service.create_reviews_table()
-    print("✅ Todas as tabelas criadas!")
-except Exception as e:
-    print(f"⚠️  Aviso ao criar tabelas: {e}")
+# Cria tabelas do sistema dentro do contexto da aplicação
+with app.app_context():
+    try:
+        print("📊 Criando tabelas do sistema...")
+        chat_service.create_chat_tables()
+        notification_service.create_notifications_table()
+        review_service.create_reviews_table()
+        print("✅ Todas as tabelas criadas!")
+    except Exception as e:
+        print(f"⚠️  Aviso ao criar tabelas: {e}")
 
 # Registra todas as rotas da aplicação (endpoints)
 print("🔌 Registrando rotas...")

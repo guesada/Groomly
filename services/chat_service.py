@@ -8,10 +8,16 @@ from sqlalchemy import or_, and_
 
 def create_chat_tables():
     """Cria as tabelas necessárias para o sistema de chat"""
+    from flask import current_app
     try:
         # As tabelas são criadas automaticamente pelo SQLAlchemy
-        db.create_all()
-        print("✅ Tabelas de chat criadas com sucesso!")
+        # Verifica se estamos dentro de um contexto de aplicação
+        if current_app:
+            db.create_all()
+            print("✅ Tabelas de chat criadas com sucesso!")
+    except RuntimeError:
+        # Se não estiver em contexto, não faz nada (será criado pelo init_app)
+        pass
     except Exception as e:
         print(f"❌ Erro ao criar tabelas de chat: {e}")
         raise
