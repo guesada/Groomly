@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-from sqlalchemy.dialects.mysql import LONGTEXT
+# Removido import LONGTEXT - usando TEXT para compatibilidade com SQLite
 import json
 
 db = SQLAlchemy()
@@ -41,17 +41,17 @@ class Professional(db.Model):
     email = db.Column(db.String(150), unique=True, nullable=False)
     senha = db.Column(db.String(200), nullable=False)
     foto = db.Column(db.String(400))
-    especialidades = db.Column(LONGTEXT)  # store JSON list: ['Corte', 'Coloração', 'Manicure', etc]
+    especialidades = db.Column(db.Text)  # store JSON list: ['Corte', 'Coloração', 'Manicure', etc]
     categoria = db.Column(db.String(100))  # 'Cabeleireiro', 'Manicure', 'Esteticista', 'Maquiador', etc
     avaliacao = db.Column(db.Float, default=5.0)
     total_avaliacoes = db.Column(db.Integer, default=0)
     preco_base = db.Column(db.Float, default=0.0)
-    disponibilidade = db.Column(LONGTEXT)  # store JSON
+    disponibilidade = db.Column(db.Text)  # store JSON
     telefone = db.Column(db.String(20))
     endereco = db.Column(db.String(300))
     bio = db.Column(db.Text)  # Biografia/descrição do profissional
     instagram = db.Column(db.String(100))
-    portfolio = db.Column(LONGTEXT)  # JSON array de URLs de fotos
+    portfolio = db.Column(db.Text)  # JSON array de URLs de fotos
     ativo = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -192,7 +192,7 @@ class Report(db.Model):
     __tablename__ = "reports"
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100))
-    dados = db.Column(LONGTEXT)
+    dados = db.Column(db.Text)
 
     def to_dict(self):
         return {"id": self.id, "nome": self.nome, "dados": json.loads(self.dados or "{}")}

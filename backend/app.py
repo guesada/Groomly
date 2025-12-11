@@ -9,35 +9,42 @@ from flask_socketio import SocketIO
 
 # Importa o registro de rotas e serviços da aplicação
 from routes import register_routes
-from routes.chat import register_chat_routes, register_socketio_events
-from routes.notifications import register_notifications_routes, register_notification_events
-from routes.analytics import register_analytics_routes
-from routes.reviews import register_reviews_routes
 import services
-from services import chat_service, notification_service, analytics_service, review_service
 
 # Cria a instância principal da aplicação Flask
 app = Flask(__name__)
 
 # Configurar CORS para permitir credenciais (cookies de sessão)
-# Permite requisições de localhost e 127.0.0.1 na porta 5001
-CORS(app, supports_credentials=True, origins=["http://localhost:5001", "http://127.0.0.1:5001"])
+# Permite requisições do frontend (porta 3000) e backend (porta 5001)
+CORS(app, 
+     supports_credentials=True, 
+     origins=[
+         "http://localhost:3000",  # Frontend React
+         "http://127.0.0.1:3000",  # Frontend React
+     ],
+     allow_headers=["Content-Type", "Authorization"],
+     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
 
 # Inicializa SocketIO para comunicação em tempo real
 import os
 is_production = os.environ.get('RENDER', False)
 async_mode = 'gevent' if is_production else 'threading'
 
-socketio = SocketIO(app, cors_allowed_origins=["http://localhost:5001", "http://127.0.0.1:5001"], 
-                    manage_session=False, async_mode=async_mode)
+socketio = SocketIO(app, cors_allowed_origins=[
+    "http://localhost:3000", "http://127.0.0.1:3000",  # Frontend React
+    "http://localhost:5001", "http://127.0.0.1:5001"   # Backend Flask
+], manage_session=False, async_mode=async_mode)
 
 # Chave secreta para criptografia de sessões e cookies
 app.secret_key = "corte_digital_2025_secret_key"
 
 # Configurações da aplicação
 app.config["JSON_SORT_KEYS"] = False  # Mantém a ordem original das chaves JSON nas respostas
-app.config["SESSION_COOKIE_SAMESITE"] = "Lax"  # Proteção contra CSRF, permite cookies em navegação normal
-app.config["SESSION_COOKIE_HTTPONLY"] = True  # Impede acesso aos cookies via JavaScript (segurança XSS)
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"  # Permite cookies em desenvolvimento
+app.config["SESSION_COOKIE_SECURE"] = False  # Permite cookies sem HTTPS em desenvolvimento
+app.config["SESSION_COOKIE_HTTPONLY"] = False  # Permite acesso via JavaScript em desenvolvimento
+app.config["SESSION_COOKIE_DOMAIN"] = None  # Permite cookies em localhost
+app.config["SESSION_PERMANENT"] = False  # Sessão não permanente
 
 # Inicializa a conexão com o banco de dados e carrega dados iniciais
 services.init_app(app)
@@ -46,9 +53,7 @@ services.init_app(app)
 with app.app_context():
     try:
         print("📊 Criando tabelas do sistema...")
-        chat_service.create_chat_tables()
-        notification_service.create_notifications_table()
-        review_service.create_reviews_table()
+        # Tabelas são criadas automaticamente pelo SQLAlchemy
         print("✅ Todas as tabelas criadas!")
     except Exception as e:
         print(f"⚠️  Aviso ao criar tabelas: {e}")
@@ -56,15 +61,6 @@ with app.app_context():
 # Registra todas as rotas da aplicação (endpoints)
 print("🔌 Registrando rotas...")
 register_routes(app)
-register_chat_routes(app)
-register_notifications_routes(app)
-register_analytics_routes(app)
-register_reviews_routes(app, socketio)
-
-# Registra eventos WebSocket
-print("⚡ Registrando eventos WebSocket...")
-register_socketio_events(socketio)
-register_notification_events(socketio)
 
 
 @app.before_request
