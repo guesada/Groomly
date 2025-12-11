@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   User, 
   Mail, 
@@ -13,10 +13,12 @@ import {
   EyeOff
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
+import { useAuth } from '@/hooks/useAuth';
 
 export const RegisterPage: React.FC = () => {
   const [userType, setUserType] = useState<'client' | 'professional'>('client');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -27,6 +29,9 @@ export const RegisterPage: React.FC = () => {
     experience: ''
   });
 
+  const { register } = useAuth();
+  const navigate = useNavigate();
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({
       ...formData,
@@ -34,10 +39,38 @@ export const RegisterPage: React.FC = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement registration logic
-    console.log('Registration data:', { ...formData, userType });
+    setLoading(true);
+
+    try {
+      const registrationData = {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        phone: formData.phone,
+        userType,
+        ...(userType === 'professional' && {
+          specialty: formData.specialty,
+          address: formData.address
+        })
+      };
+
+      const success = await register(registrationData);
+      
+      if (success) {
+        // Redireciona baseado no tipo de usuário
+        if (userType === 'client') {
+          navigate('/cliente');
+        } else {
+          navigate('/barbeiro');
+        }
+      }
+    } catch (error) {
+      console.error('Erro no registro:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -53,9 +86,13 @@ export const RegisterPage: React.FC = () => {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.2 }}
-            className="mx-auto w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center shadow-lg mb-6"
+            className="mx-auto w-28 h-28 mb-6"
           >
-            <Sparkles className="w-8 h-8 text-white" />
+            <img 
+              src="/logo.png" 
+              alt="Groomly Logo" 
+              className="w-full h-full object-contain"
+            />
           </motion.div>
           
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
@@ -228,10 +265,13 @@ export const RegisterPage: React.FC = () => {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               type="submit"
-              className="w-full btn-primary text-lg py-4 group"
+              disabled={loading}
+              className="w-full btn-primary text-lg py-4 group disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <span>Criar Conta</span>
-              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-200" />
+              <span>{loading ? 'Criando conta...' : 'Criar Conta'}</span>
+              {!loading && (
+                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-200" />
+              )}
             </motion.button>
           </form>
 

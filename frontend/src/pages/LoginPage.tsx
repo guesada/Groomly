@@ -1,8 +1,35 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { Link, useNavigate } from 'react-router-dom';
 import { LogIn, Sparkles } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 export const LoginPage: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const success = await login(email, password);
+      
+      if (success) {
+        // Redireciona para a página inicial, o ProtectedRoute cuidará do resto
+        navigate('/', { replace: true });
+      }
+    } catch (error) {
+      console.error('Erro no login:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-primary-50/30 flex items-center justify-center">
       <motion.div
@@ -11,11 +38,12 @@ export const LoginPage: React.FC = () => {
         className="card max-w-md w-full mx-4"
       >
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center space-x-3 mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-lg">
-              <Sparkles className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-2xl font-bold text-gray-900">Groomly</span>
+          <div className="flex items-center justify-center mb-6">
+            <img 
+              src="/logo.png" 
+              alt="Groomly Logo" 
+              className="w-24 h-24 object-contain"
+            />
           </div>
           
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
@@ -26,15 +54,18 @@ export const LoginPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Email
             </label>
             <input
               type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
               placeholder="seu@email.com"
+              required
             />
           </div>
           
@@ -44,8 +75,11 @@ export const LoginPage: React.FC = () => {
             </label>
             <input
               type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
               placeholder="••••••••"
+              required
             />
           </div>
           
@@ -62,19 +96,21 @@ export const LoginPage: React.FC = () => {
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="w-full btn-primary"
+            type="submit"
+            disabled={loading}
+            className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <LogIn className="w-5 h-5 mr-2" />
-            Entrar
+            {loading ? 'Entrando...' : 'Entrar'}
           </motion.button>
           
           <p className="text-center text-gray-600">
             Não tem uma conta?{' '}
-            <a href="/register" className="text-primary-600 hover:text-primary-700 font-medium">
+            <Link to="/register" className="text-primary-600 hover:text-primary-700 font-medium">
               Cadastre-se gratuitamente
-            </a>
+            </Link>
           </p>
-        </div>
+        </form>
       </motion.div>
     </div>
   );

@@ -1,8 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Play, Sparkles, Star } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export const Hero: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Elements */}
@@ -96,6 +99,7 @@ export const Hero: React.FC = () => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => navigate('/register')}
                 className="btn-primary text-lg px-8 py-4 group"
               >
                 <span>Começar Agora</span>
@@ -105,6 +109,10 @@ export const Hero: React.FC = () => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => {
+                  const element = document.getElementById('how-it-works');
+                  element?.scrollIntoView({ behavior: 'smooth' });
+                }}
                 className="btn-secondary text-lg px-8 py-4 group"
               >
                 <Play className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform duration-200" />

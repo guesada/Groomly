@@ -5,53 +5,44 @@ import {
   Clock, 
   User, 
   Star, 
-  MapPin, 
   Phone,
   Plus,
   History,
   Settings
 } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { useDashboard } from '@/hooks/useDashboard';
 
 export const ClientDashboard: React.FC = () => {
-  const upcomingAppointments = [
-    {
-      id: 1,
-      professional: 'João Silva',
-      service: 'Corte + Barba',
-      date: '2024-01-15',
-      time: '14:00',
-      location: 'Barbearia Central',
-      price: 'R$ 45,00'
-    },
-    {
-      id: 2,
-      professional: 'Maria Santos',
-      service: 'Corte Feminino',
-      date: '2024-01-18',
-      time: '10:30',
-      location: 'Salão Elegance',
-      price: 'R$ 80,00'
-    }
-  ];
+  const { user, logout } = useAuth();
+  const { data: dashboardData, loading, error } = useDashboard();
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div>
+      </div>
+    );
+  }
 
-  const recentHistory = [
-    {
-      id: 1,
-      professional: 'Carlos Mendes',
-      service: 'Corte + Barba',
-      date: '2024-01-10',
-      rating: 5,
-      price: 'R$ 45,00'
-    },
-    {
-      id: 2,
-      professional: 'Ana Costa',
-      service: 'Manicure',
-      date: '2024-01-08',
-      rating: 4,
-      price: 'R$ 25,00'
-    }
-  ];
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="btn-primary"
+          >
+            Tentar Novamente
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const upcomingAppointments = dashboardData?.upcoming_appointments || [];
+  const recentHistory = dashboardData?.recent_history || [];
+  const stats = dashboardData?.stats || {};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-primary-50/30">
@@ -60,17 +51,27 @@ export const ClientDashboard: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center">
-                <User className="w-6 h-6 text-white" />
-              </div>
+              <img 
+                src="/logo.png" 
+                alt="Groomly Logo" 
+                className="w-20 h-20 object-contain"
+              />
               <div>
-                <h1 className="text-xl font-bold text-gray-900">Olá, Cliente!</h1>
+                <h1 className="text-xl font-bold text-gray-900">Olá, {user?.name || 'Cliente'}!</h1>
                 <p className="text-sm text-gray-600">Gerencie seus agendamentos</p>
               </div>
             </div>
-            <button className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors duration-200">
-              <Settings className="w-5 h-5 text-gray-600" />
-            </button>
+            <div className="flex items-center space-x-2">
+              <button 
+                onClick={logout}
+                className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors duration-200"
+              >
+                Sair
+              </button>
+              <button className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors duration-200">
+                <Settings className="w-5 h-5 text-gray-600" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -106,8 +107,18 @@ export const ClientDashboard: React.FC = () => {
             {/* Upcoming Appointments */}
             <div className="bg-white rounded-2xl p-6 shadow-lg ring-1 ring-gray-200/50">
               <h2 className="text-xl font-bold text-gray-900 mb-6">Próximos Agendamentos</h2>
-              <div className="space-y-4">
-                {upcomingAppointments.map((appointment) => (
+              {upcomingAppointments.length === 0 ? (
+                <div className="text-center py-8">
+                  <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500">Nenhum agendamento próximo</p>
+                  <button className="btn-primary mt-4">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Agendar Serviço
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {upcomingAppointments.map((appointment) => (
                   <motion.div
                     key={appointment.id}
                     initial={{ opacity: 0, y: 20 }}
@@ -116,8 +127,8 @@ export const ClientDashboard: React.FC = () => {
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900">{appointment.service}</h3>
-                        <p className="text-gray-600 mt-1">com {appointment.professional}</p>
+                        <h3 className="font-semibold text-gray-900">{appointment.servico}</h3>
+                        <p className="text-gray-600 mt-1">com {appointment.profissional}</p>
                         
                         <div className="flex items-center space-x-4 mt-3 text-sm text-gray-500">
                           <div className="flex items-center space-x-1">
@@ -129,14 +140,21 @@ export const ClientDashboard: React.FC = () => {
                             <span>{appointment.time}</span>
                           </div>
                           <div className="flex items-center space-x-1">
-                            <MapPin className="w-4 h-4" />
-                            <span>{appointment.location}</span>
+                            <span className={`px-2 py-1 text-xs rounded-lg ${
+                              appointment.status === 'confirmado' 
+                                ? 'bg-green-100 text-green-700' 
+                                : 'bg-yellow-100 text-yellow-700'
+                            }`}>
+                              {appointment.status === 'confirmado' ? 'Confirmado' : 'Agendado'}
+                            </span>
                           </div>
                         </div>
                       </div>
                       
                       <div className="text-right">
-                        <p className="font-bold text-primary-600">{appointment.price}</p>
+                        <p className="font-bold text-primary-600">
+                          R$ {appointment.total_price?.toFixed(2) || '0,00'}
+                        </p>
                         <div className="flex space-x-2 mt-2">
                           <button className="px-3 py-1 text-xs bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors duration-200">
                             Cancelar
@@ -149,14 +167,21 @@ export const ClientDashboard: React.FC = () => {
                     </div>
                   </motion.div>
                 ))}
-              </div>
+                </div>
+              )}
             </div>
 
             {/* Recent History */}
             <div className="bg-white rounded-2xl p-6 shadow-lg ring-1 ring-gray-200/50">
               <h2 className="text-xl font-bold text-gray-900 mb-6">Histórico Recente</h2>
-              <div className="space-y-4">
-                {recentHistory.map((item) => (
+              {recentHistory.length === 0 ? (
+                <div className="text-center py-8">
+                  <History className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500">Nenhum histórico ainda</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {recentHistory.map((item) => (
                   <div
                     key={item.id}
                     className="flex items-center justify-between p-4 border border-gray-200 rounded-xl"
@@ -186,7 +211,8 @@ export const ClientDashboard: React.FC = () => {
                     </div>
                   </div>
                 ))}
-              </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -198,12 +224,14 @@ export const ClientDashboard: React.FC = () => {
                 <div className="w-20 h-20 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full mx-auto mb-4 flex items-center justify-center">
                   <User className="w-10 h-10 text-white" />
                 </div>
-                <h3 className="font-bold text-gray-900">João Cliente</h3>
-                <p className="text-gray-600">joao@email.com</p>
-                <div className="flex items-center justify-center space-x-1 mt-2">
-                  <Phone className="w-4 h-4 text-gray-400" />
-                  <span className="text-sm text-gray-600">(11) 99999-9999</span>
-                </div>
+                <h3 className="font-bold text-gray-900">{user?.name || 'Cliente'}</h3>
+                <p className="text-gray-600">{user?.email}</p>
+                {user?.phone && (
+                  <div className="flex items-center justify-center space-x-1 mt-2">
+                    <Phone className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm text-gray-600">{user.phone}</span>
+                  </div>
+                )}
                 
                 <button className="w-full mt-4 btn-ghost">
                   Editar Perfil
@@ -217,18 +245,17 @@ export const ClientDashboard: React.FC = () => {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Total de Serviços</span>
-                  <span className="font-bold text-gray-900">24</span>
+                  <span className="font-bold text-gray-900">{stats.total_appointments || 0}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Valor Gasto</span>
-                  <span className="font-bold text-gray-900">R$ 1.280,00</span>
+                  <span className="font-bold text-gray-900">
+                    R$ {stats.total_spent?.toFixed(2) || '0,00'}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Avaliação Média</span>
-                  <div className="flex items-center space-x-1">
-                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                    <span className="font-bold text-gray-900">4.8</span>
-                  </div>
+                  <span className="text-gray-600">Próximos Agendamentos</span>
+                  <span className="font-bold text-primary-600">{stats.upcoming_count || 0}</span>
                 </div>
               </div>
             </div>

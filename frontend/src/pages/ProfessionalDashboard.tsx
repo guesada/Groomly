@@ -12,46 +12,38 @@ import {
   Plus,
   BarChart3
 } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { useDashboard } from '@/hooks/useDashboard';
 
 export const ProfessionalDashboard: React.FC = () => {
-  const todayAppointments = [
-    {
-      id: 1,
-      client: 'João Silva',
-      service: 'Corte + Barba',
-      time: '09:00',
-      duration: '45min',
-      price: 'R$ 45,00',
-      status: 'confirmed'
-    },
-    {
-      id: 2,
-      client: 'Maria Santos',
-      service: 'Corte Feminino',
-      time: '10:30',
-      duration: '60min',
-      price: 'R$ 80,00',
-      status: 'confirmed'
-    },
-    {
-      id: 3,
-      client: 'Carlos Mendes',
-      service: 'Barba',
-      time: '14:00',
-      duration: '30min',
-      price: 'R$ 25,00',
-      status: 'pending'
-    }
-  ];
+  const { user, logout } = useAuth();
+  const { data: dashboardData, loading, error } = useDashboard();
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div>
+      </div>
+    );
+  }
 
-  const stats = {
-    todayRevenue: 'R$ 320,00',
-    monthRevenue: 'R$ 8.450,00',
-    todayClients: 8,
-    monthClients: 156,
-    rating: 4.9,
-    totalReviews: 234
-  };
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="btn-primary"
+          >
+            Tentar Novamente
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const todayAppointments = dashboardData?.today_appointments || [];
+  const stats = dashboardData?.stats || {};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-primary-50/30">
@@ -60,11 +52,13 @@ export const ProfessionalDashboard: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center">
-                <User className="w-6 h-6 text-white" />
-              </div>
+              <img 
+                src="/logo.png" 
+                alt="Groomly Logo" 
+                className="w-20 h-20 object-contain"
+              />
               <div>
-                <h1 className="text-xl font-bold text-gray-900">Olá, Profissional!</h1>
+                <h1 className="text-xl font-bold text-gray-900">Olá, {user?.name || 'Profissional'}!</h1>
                 <p className="text-sm text-gray-600">Gerencie seu negócio</p>
               </div>
             </div>
@@ -72,6 +66,12 @@ export const ProfessionalDashboard: React.FC = () => {
               <button className="btn-primary">
                 <Plus className="w-4 h-4 mr-2" />
                 Novo Horário
+              </button>
+              <button 
+                onClick={logout}
+                className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors duration-200"
+              >
+                Sair
               </button>
               <button className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors duration-200">
                 <Settings className="w-5 h-5 text-gray-600" />
@@ -92,7 +92,9 @@ export const ProfessionalDashboard: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Receita Hoje</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.todayRevenue}</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  R$ {stats.today_revenue?.toFixed(2) || '0,00'}
+                </p>
               </div>
               <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
                 <DollarSign className="w-6 h-6 text-green-600" />
@@ -109,7 +111,7 @@ export const ProfessionalDashboard: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Clientes Hoje</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.todayClients}</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.today_clients || 0}</p>
               </div>
               <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
                 <Users className="w-6 h-6 text-blue-600" />
@@ -126,7 +128,9 @@ export const ProfessionalDashboard: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Receita Mensal</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.monthRevenue}</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  R$ {stats.month_revenue?.toFixed(2) || '0,00'}
+                </p>
               </div>
               <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center">
                 <TrendingUp className="w-6 h-6 text-primary-600" />
@@ -144,7 +148,7 @@ export const ProfessionalDashboard: React.FC = () => {
               <div>
                 <p className="text-sm text-gray-600">Avaliação</p>
                 <div className="flex items-center space-x-2">
-                  <p className="text-2xl font-bold text-gray-900">{stats.rating}</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.rating?.toFixed(1) || '0.0'}</p>
                   <Star className="w-5 h-5 text-yellow-400 fill-current" />
                 </div>
               </div>
@@ -172,8 +176,14 @@ export const ProfessionalDashboard: React.FC = () => {
                 </span>
               </div>
 
-              <div className="space-y-4">
-                {todayAppointments.map((appointment) => (
+              {todayAppointments.length === 0 ? (
+                <div className="text-center py-8">
+                  <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500">Nenhum agendamento para hoje</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {todayAppointments.map((appointment) => (
                   <motion.div
                     key={appointment.id}
                     initial={{ opacity: 0, x: -20 }}
@@ -186,35 +196,42 @@ export const ProfessionalDashboard: React.FC = () => {
                           <User className="w-6 h-6 text-primary-600" />
                         </div>
                         <div>
-                          <h3 className="font-semibold text-gray-900">{appointment.client}</h3>
-                          <p className="text-gray-600">{appointment.service}</p>
+                          <h3 className="font-semibold text-gray-900">{appointment.cliente}</h3>
+                          <p className="text-gray-600">{appointment.servico}</p>
                           <div className="flex items-center space-x-3 mt-1 text-sm text-gray-500">
                             <div className="flex items-center space-x-1">
                               <Clock className="w-4 h-4" />
                               <span>{appointment.time}</span>
                             </div>
-                            <span>•</span>
-                            <span>{appointment.duration}</span>
+                            {appointment.cliente_email && (
+                              <>
+                                <span>•</span>
+                                <span>{appointment.cliente_email}</span>
+                              </>
+                            )}
                           </div>
                         </div>
                       </div>
                       
                       <div className="text-right">
-                        <p className="font-bold text-primary-600">{appointment.price}</p>
+                        <p className="font-bold text-primary-600">
+                          R$ {appointment.total_price?.toFixed(2) || '0,00'}
+                        </p>
                         <div className="flex items-center space-x-2 mt-2">
                           <span className={`px-2 py-1 text-xs rounded-lg ${
-                            appointment.status === 'confirmed' 
+                            appointment.status === 'confirmado' 
                               ? 'bg-green-100 text-green-700' 
                               : 'bg-yellow-100 text-yellow-700'
                           }`}>
-                            {appointment.status === 'confirmed' ? 'Confirmado' : 'Pendente'}
+                            {appointment.status === 'confirmado' ? 'Confirmado' : 'Agendado'}
                           </span>
                         </div>
                       </div>
                     </div>
                   </motion.div>
                 ))}
-              </div>
+                </div>
+              )}
             </div>
 
             {/* Quick Actions */}
@@ -259,12 +276,12 @@ export const ProfessionalDashboard: React.FC = () => {
                 <div className="w-20 h-20 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full mx-auto mb-4 flex items-center justify-center">
                   <User className="w-10 h-10 text-white" />
                 </div>
-                <h3 className="font-bold text-gray-900">João Barbeiro</h3>
-                <p className="text-gray-600">Especialista em Cortes</p>
+                <h3 className="font-bold text-gray-900">{user?.name || 'Profissional'}</h3>
+                <p className="text-gray-600">{user?.email}</p>
                 <div className="flex items-center justify-center space-x-1 mt-2">
                   <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                  <span className="font-semibold text-gray-900">{stats.rating}</span>
-                  <span className="text-sm text-gray-600">({stats.totalReviews} avaliações)</span>
+                  <span className="font-semibold text-gray-900">{stats.rating?.toFixed(1) || '0.0'}</span>
+                  <span className="text-sm text-gray-600">({stats.total_reviews || 0} avaliações)</span>
                 </div>
                 
                 <button className="w-full mt-4 btn-ghost">
@@ -279,19 +296,24 @@ export const ProfessionalDashboard: React.FC = () => {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Clientes Atendidos</span>
-                  <span className="font-bold text-gray-900">{stats.monthClients}</span>
+                  <span className="font-bold text-gray-900">{stats.month_clients || 0}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Receita Total</span>
-                  <span className="font-bold text-gray-900">{stats.monthRevenue}</span>
+                  <span className="font-bold text-gray-900">
+                    R$ {stats.month_revenue?.toFixed(2) || '0,00'}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Ticket Médio</span>
-                  <span className="font-bold text-gray-900">R$ 54,17</span>
+                  <span className="text-gray-600">Avaliação</span>
+                  <div className="flex items-center space-x-1">
+                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                    <span className="font-bold text-gray-900">{stats.rating?.toFixed(1) || '0.0'}</span>
+                  </div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Taxa de Ocupação</span>
-                  <span className="font-bold text-green-600">87%</span>
+                  <span className="text-gray-600">Total Avaliações</span>
+                  <span className="font-bold text-gray-900">{stats.total_reviews || 0}</span>
                 </div>
               </div>
             </div>
