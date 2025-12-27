@@ -71,7 +71,7 @@ export const CTA: React.FC = () => {
 
           {/* Subtitle */}
           <p className="text-xl text-white/90 mb-10 max-w-2xl mx-auto text-balance">
-            Junte-se a milhares de profissionais que já usam o Groomly para 
+            Junte-se a milhares de profissionais que já usam o Zelo para 
             revolucionar seus negócios de beleza
           </p>
 

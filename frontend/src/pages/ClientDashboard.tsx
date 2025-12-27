@@ -53,7 +53,7 @@ export const ClientDashboard: React.FC = () => {
             <div className="flex items-center space-x-3">
               <img 
                 src="/logo.png" 
-                alt="Groomly Logo" 
+                alt="Zelo Logo" 
                 className="w-20 h-20 object-contain"
               />
               <div>

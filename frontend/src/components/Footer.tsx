@@ -55,7 +55,7 @@ export const Footer: React.FC = () => {
                   </div>
                   <div className="absolute -top-1 -right-1 w-4 h-4 bg-primary-400 rounded-full animate-pulse" />
                 </div>
-                <span className="text-2xl font-bold">Groomly</span>
+                <span className="text-2xl font-bold">Zelo</span>
               </motion.div>
               
               <p className="text-gray-400 mb-6 max-w-md leading-relaxed">
@@ -157,7 +157,7 @@ export const Footer: React.FC = () => {
         <div className="border-t border-gray-800 py-8">
           <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
             <p className="text-gray-400 text-sm">
-              © 2025 Groomly. Todos os direitos reservados.
+              © 2025 Zelo. Todos os direitos reservados.
             </p>
             
             <div className="flex items-center space-x-6 text-sm text-gray-400">

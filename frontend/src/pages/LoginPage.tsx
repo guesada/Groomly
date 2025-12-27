@@ -41,7 +41,7 @@ export const LoginPage: React.FC = () => {
           <div className="flex items-center justify-center mb-6">
             <img 
               src="/logo.png" 
-              alt="Groomly Logo" 
+              alt="Zelo Logo" 
               className="w-24 h-24 object-contain"
             />
           </div>

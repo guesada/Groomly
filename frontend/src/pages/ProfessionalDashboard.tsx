@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Calendar, 
@@ -14,10 +14,53 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useDashboard } from '@/hooks/useDashboard';
+import { ProfessionalSetupModal } from '@/components/ProfessionalSetupModal';
 
 export const ProfessionalDashboard: React.FC = () => {
   const { user, logout } = useAuth();
-  const { data: dashboardData, loading, error } = useDashboard();
+  const { data: dashboardData, loading, error, refetch } = useDashboard();
+  const [showSetupModal, setShowSetupModal] = useState(false);
+
+  // Verifica se o profissional precisa configurar seus horários
+  useEffect(() => {
+    const checkSetup = async () => {
+      try {
+        const response = await fetch('/api/user/working-hours', {
+          credentials: 'include'
+        });
+        const data = await response.json();
+        
+        // Se não tem horários configurados, abre o modal
+        if (data.success && (!data.data || data.data.length === 0)) {
+          setShowSetupModal(true);
+        }
+      } catch (err) {
+        console.error('Erro ao verificar configuração:', err);
+      }
+    };
+    
+    if (user) {
+      checkSetup();
+    }
+  }, [user]);
+
+  const handleSaveSetup = async (setupData: { specialty: string; workingHours: Record<number, any> }) => {
+    const response = await fetch('/api/user/setup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(setupData)
+    });
+    
+    const data = await response.json();
+    if (!data.success) {
+      throw new Error(data.message);
+    }
+    
+    // Atualiza os dados do dashboard
+    refetch();
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -54,7 +97,7 @@ export const ProfessionalDashboard: React.FC = () => {
             <div className="flex items-center space-x-3">
               <img 
                 src="/logo.png" 
-                alt="Groomly Logo" 
+                alt="Zelo Logo" 
                 className="w-20 h-20 object-contain"
               />
               <div>
@@ -73,7 +116,11 @@ export const ProfessionalDashboard: React.FC = () => {
               >
                 Sair
               </button>
-              <button className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors duration-200">
+              <button 
+                onClick={() => setShowSetupModal(true)}
+                className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors duration-200"
+                title="Configurar horários"
+              >
                 <Settings className="w-5 h-5 text-gray-600" />
               </button>
             </div>
@@ -351,6 +398,16 @@ export const ProfessionalDashboard: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Setup Modal */}
+      <ProfessionalSetupModal
+        isOpen={showSetupModal}
+        onClose={() => setShowSetupModal(false)}
+        onSave={handleSaveSetup}
+        initialData={{
+          specialty: user?.categoria || ''
+        }}
+      />
     </div>
   );
 };

@@ -1,24 +1,27 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { 
-  User, 
-  Mail, 
-  Lock, 
-  Phone, 
-  MapPin, 
+import {
+  User,
+  Mail,
+  Lock,
+  Phone,
+  MapPin,
   Sparkles,
   ArrowRight,
   Eye,
-  EyeOff
+  EyeOff,
+  ChevronRight,
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { useAuth } from '@/hooks/useAuth';
+import { SpecialtyModal } from '@/components/SpecialtyModal';
 
 export const RegisterPage: React.FC = () => {
   const [userType, setUserType] = useState<'client' | 'professional'>('client');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showSpecialtyModal, setShowSpecialtyModal] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -83,24 +86,36 @@ export const RegisterPage: React.FC = () => {
         {/* Header */}
         <div className="text-center">
           <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.2 }}
-            className="mx-auto w-28 h-28 mb-6"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
+            className="relative mx-auto mb-8"
           >
-            <img 
-              src="/logo.png" 
-              alt="Groomly Logo" 
-              className="w-full h-full object-contain"
-            />
+            {/* Glow effect */}
+            <div className="absolute inset-0 w-24 h-24 mx-auto bg-primary-400/20 rounded-full blur-2xl" />
+            
+            {/* Logo container */}
+            <div className="relative w-24 h-24 mx-auto bg-white rounded-2xl shadow-lg shadow-primary-100/50 p-3 ring-1 ring-gray-100">
+              <img 
+                src="/logo.png" 
+                alt="Zelo Logo" 
+                className="w-full h-full object-contain"
+              />
+            </div>
           </motion.div>
           
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Criar Conta
-          </h2>
-          <p className="text-gray-600">
-            Junte-se à plataforma de beleza mais moderna
-          </p>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+              Bem-vindo ao Zelo
+            </h2>
+            <p className="text-gray-500">
+              Crie sua conta e comece agora
+            </p>
+          </motion.div>
         </div>
 
         {/* User Type Selection */}
@@ -224,20 +239,28 @@ export const RegisterPage: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Especialidade
                   </label>
-                  <select
-                    name="specialty"
-                    value={formData.specialty}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
-                    required
+                  <button
+                    type="button"
+                    onClick={() => setShowSpecialtyModal(true)}
+                    className={cn(
+                      'w-full flex items-center justify-between px-4 py-3 border rounded-xl transition-all duration-200 text-left',
+                      formData.specialty
+                        ? 'border-primary-300 bg-primary-50/50'
+                        : 'border-gray-300 hover:border-gray-400'
+                    )}
                   >
-                    <option value="">Selecione sua especialidade</option>
-                    <option value="barbeiro">Barbeiro</option>
-                    <option value="cabeleireiro">Cabeleireiro</option>
-                    <option value="manicure">Manicure</option>
-                    <option value="esteticista">Esteticista</option>
-                    <option value="maquiador">Maquiador</option>
-                  </select>
+                    <div className="flex items-center space-x-3">
+                      <Sparkles className="w-5 h-5 text-gray-400" />
+                      {formData.specialty ? (
+                        <span className="text-gray-900 font-medium capitalize">
+                          {formData.specialty}
+                        </span>
+                      ) : (
+                        <span className="text-gray-500">Selecione sua especialidade</span>
+                      )}
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-gray-400" />
+                  </button>
                 </div>
 
                 <div>
@@ -299,6 +322,14 @@ export const RegisterPage: React.FC = () => {
           </Link>
         </div>
       </motion.div>
+
+      {/* Specialty Modal */}
+      <SpecialtyModal
+        isOpen={showSpecialtyModal}
+        onClose={() => setShowSpecialtyModal(false)}
+        onSelect={(specialty) => setFormData({ ...formData, specialty })}
+        selectedSpecialty={formData.specialty}
+      />
     </div>
   );
 };

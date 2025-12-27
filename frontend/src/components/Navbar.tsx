@@ -46,7 +46,7 @@ export const Navbar: React.FC = () => {
             >
               <img 
                 src="/logo.png" 
-                alt="Groomly Logo" 
+                alt="Zelo Logo" 
                 className="w-24 h-24 object-contain"
               />
             </motion.div>
