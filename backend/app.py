@@ -7,21 +7,23 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_socketio import SocketIO
 
-# Importa o registro de rotas e serviços da aplicação
+# Importa configurações e banco de dados
+from config import Config
+from database import db
+
+# Importa o registro de rotas
 from routes import register_routes
-import services
 
 # Cria a instância principal da aplicação Flask
 app = Flask(__name__)
 
+# Carrega configurações
+app.config.from_object(Config)
+
 # Configurar CORS para permitir credenciais (cookies de sessão)
-# Permite requisições do frontend (porta 3000) e backend (porta 5001)
 CORS(app, 
      supports_credentials=True, 
-     origins=[
-         "http://localhost:3000",  # Frontend React
-         "http://127.0.0.1:3000",  # Frontend React
-     ],
+     origins=Config.CORS_ORIGINS,
      allow_headers=["Content-Type", "Authorization"],
      methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
 
@@ -30,51 +32,11 @@ import os
 is_production = os.environ.get('RENDER', False)
 async_mode = 'gevent' if is_production else 'threading'
 
-socketio = SocketIO(app, cors_allowed_origins=[
-    "http://localhost:3000", "http://127.0.0.1:3000",  # Frontend React
-    "http://localhost:5001", "http://127.0.0.1:5001"   # Backend Flask
-], manage_session=False, async_mode=async_mode)
-
-# Chave secreta para criptografia de sessões e cookies
-app.secret_key = "corte_digital_2025_secret_key"
-
-# Configurações da aplicação
-app.config["JSON_SORT_KEYS"] = False  # Mantém a ordem original das chaves JSON nas respostas
-app.config["SESSION_COOKIE_SAMESITE"] = "Lax"  # Permite cookies em desenvolvimento
-app.config["SESSION_COOKIE_SECURE"] = False  # Permite cookies sem HTTPS em desenvolvimento
-app.config["SESSION_COOKIE_HTTPONLY"] = False  # Permite acesso via JavaScript em desenvolvimento
-app.config["SESSION_COOKIE_DOMAIN"] = None  # Permite cookies em localhost
-app.config["SESSION_PERMANENT"] = False  # Sessão não permanente
-
-# Inicializa a conexão com o banco de dados e carrega dados iniciais
-services.init_app(app)
-
-# Cria tabelas do sistema dentro do contexto da aplicação
-with app.app_context():
-    try:
-        print("📊 Criando tabelas do sistema...")
-        # Tabelas são criadas automaticamente pelo SQLAlchemy
-        print("✅ Todas as tabelas criadas!")
-    except Exception as e:
-        print(f"⚠️  Aviso ao criar tabelas: {e}")
+socketio = SocketIO(app, cors_allowed_origins=Config.CORS_ORIGINS, manage_session=False, async_mode=async_mode)
 
 # Registra todas as rotas da aplicação (endpoints)
 print("🔌 Registrando rotas...")
 register_routes(app)
-
-
-@app.before_request
-def auto_complete_appointments():
-    """
-    Middleware executado antes de cada requisição HTTP.
-    Verifica e marca automaticamente como concluídos os agendamentos
-    que já passaram da data/hora agendada.
-    """
-    try:
-        services.auto_complete_past_appointments()
-    except Exception as e:
-        # Não bloqueia a requisição se houver erro na verificação automática
-        print(f"Erro ao auto-completar agendamentos: {e}")
 
 
 @app.errorhandler(404)
@@ -121,18 +83,14 @@ if __name__ == "__main__":
             pass
     
     # Inicia o servidor Flask com SocketIO
-    # Em produção, usa a porta do ambiente. Em desenvolvimento, usa 5001
-    port = int(os.environ.get("PORT", 5001))
-    host = os.environ.get("HOST", "127.0.0.1")
-    debug = os.environ.get("DEBUG", "True") == "True"
-    
     print("=" * 60)
-    print("  🚀 CORTE DIGITAL - Servidor Iniciando")
+    print("  🚀 GROOMLY - Servidor Iniciando")
     print("=" * 60)
-    print(f"  📍 Endereço: http://{host}:{port}")
+    print(f"  📍 Endereço: http://{Config.HOST}:{Config.PORT}")
     print(f"  🔧 Modo: {'Produção' if os.environ.get('RENDER') else 'Desenvolvimento'}")
     print(f"  🔌 Async mode: {async_mode}")
+    print(f"  🗄️  Database: Supabase")
     print("=" * 60)
     print()
     
-    socketio.run(app, host=host, port=port, debug=debug, allow_unsafe_werkzeug=True)
+    socketio.run(app, host=Config.HOST, port=Config.PORT, debug=Config.DEBUG, allow_unsafe_werkzeug=True)

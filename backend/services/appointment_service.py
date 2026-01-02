@@ -1,6 +1,6 @@
 """Serviço de gerenciamento de agendamentos."""
 from flask import session
-from db import db, Appointment
+from database import db
 from datetime import datetime
 import uuid
 
@@ -9,101 +9,59 @@ def list_appointments_for_user():
     """Lista agendamentos do usuário atual."""
     email = session.get("usuario_email")
     tipo = session.get("usuario_tipo")
+    user_id = session.get("usuario_id")
     
     if tipo == "barbeiro":
         # Barbeiro vê seus próprios agendamentos
-        nome = session.get("usuario_nome")
-        appointments = Appointment.query.filter_by(barbeiro=nome).all()
+        appointments = db.get_appointments_by_professional(user_id)
     else:
         # Cliente vê seus agendamentos
-        appointments = Appointment.query.filter_by(cliente_email=email).all()
+        appointments = db.get_appointments_by_client(user_id)
     
-    return [apt.to_dict() for apt in appointments]
+    return appointments
 
 
 def list_appointments_for_barber(barber_id, date=None):
     """Lista agendamentos de um barbeiro específico."""
-    query = Appointment.query.filter_by(barbeiro_id=barber_id)
-    
     if date:
-        query = query.filter_by(date=date)
+        appointments = db.get_appointments_by_date(date, barber_id)
+    else:
+        appointments = db.get_appointments_by_professional(barber_id)
     
-    appointments = query.all()
-    return [apt.to_dict() for apt in appointments]
+    return appointments
 
 
 def create_appointment(data):
     """Cria um novo agendamento."""
     appointment_id = str(uuid.uuid4())
     
-    appointment = Appointment(
-        id=appointment_id,
-        cliente=session.get("usuario_nome"),
-        cliente_email=session.get("usuario_email"),
-        barbeiro=data.get("barberName"),
-        barbeiro_id=data.get("barberId"),
-        servico=data.get("serviceName"),
-        servico_id=data.get("serviceId"),
-        date=data.get("date"),
-        time=data.get("time"),
-        status="agendado",
-        total_price=data.get("totalPrice", 0.0)
-    )
+    appointment_data = {
+        'id': appointment_id,
+        'cliente': session.get("usuario_nome"),
+        'cliente_email': session.get("usuario_email"),
+        'cliente_id': session.get("usuario_id"),
+        'profissional': data.get("barberName"),
+        'profissional_id': data.get("barberId"),
+        'servico': data.get("serviceName"),
+        'servico_id': data.get("serviceId"),
+        'date': data.get("date"),
+        'time': data.get("time"),
+        'status': "agendado",
+        'total_price': data.get("totalPrice", 0.0),
+        'created_at': datetime.utcnow().isoformat()
+    }
     
-    db.session.add(appointment)
-    db.session.commit()
-    
-    return appointment.to_dict()
+    result = db.create_appointment(appointment_data)
+    return result
 
 
 def cancel_appointment_by_id(appointment_id):
     """Cancela um agendamento."""
-    appointment = Appointment.query.get(appointment_id)
-    
-    if not appointment:
-        return False
-    
-    appointment.status = "cancelado"
-    db.session.commit()
-    return True
+    result = db.update_appointment(appointment_id, {'status': 'cancelado'})
+    return result is not None
 
 
 def update_appointment_status(appointment_id, status):
     """Atualiza o status de um agendamento."""
-    appointment = Appointment.query.get(appointment_id)
-    
-    if not appointment:
-        return False
-    
-    appointment.status = status
-    db.session.commit()
-    return True
-
-
-def auto_complete_past_appointments():
-    """Marca automaticamente como concluídos os agendamentos passados."""
-    now = datetime.now()
-    current_date = now.strftime("%Y-%m-%d")
-    current_time = now.strftime("%H:%M")
-    
-    # Buscar agendamentos agendados que já passaram
-    past_appointments = Appointment.query.filter(
-        Appointment.status == "agendado",
-        db.or_(
-            Appointment.date < current_date,
-            db.and_(
-                Appointment.date == current_date,
-                Appointment.time < current_time
-            )
-        )
-    ).all()
-    
-    count = 0
-    for apt in past_appointments:
-        apt.status = "concluido"
-        count += 1
-    
-    if count > 0:
-        db.session.commit()
-    
-    return count
+    result = db.update_appointment(appointment_id, {'status': status})
+    return result is not None

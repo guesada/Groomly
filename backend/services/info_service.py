@@ -1,18 +1,18 @@
 """Serviço de informações gerais (barbeiros, serviços, notificações, relatórios)."""
-from db import db, Barber, Service, Appointment
+from database import db
 from datetime import datetime, timedelta
 
 
 def list_barbers():
     """Lista todos os barbeiros."""
-    barbers = Barber.query.all()
-    return [barber.to_dict() for barber in barbers]
+    professionals = db.get_all_professionals()
+    return professionals
 
 
 def list_services():
     """Lista todos os serviços."""
-    services = Service.query.all()
-    return [service.to_dict() for service in services]
+    services = db.get_all_services()
+    return services
 
 
 def list_notifications():
@@ -29,16 +29,17 @@ def report_week():
     week_ago_str = week_ago.strftime("%Y-%m-%d")
     
     # Buscar agendamentos da semana
-    appointments = Appointment.query.filter(Appointment.date >= week_ago_str).all()
+    # TODO: Implementar busca por período no Supabase
+    appointments = []  # Placeholder
     
     # Calcular estatísticas
     total_appointments = len(appointments)
-    completed = len([a for a in appointments if a.status == "concluido"])
-    cancelled = len([a for a in appointments if a.status == "cancelado"])
-    pending = len([a for a in appointments if a.status == "agendado"])
+    completed = len([a for a in appointments if a.get('status') == "concluido"])
+    cancelled = len([a for a in appointments if a.get('status') == "cancelado"])
+    pending = len([a for a in appointments if a.get('status') == "agendado"])
     
     # Calcular receita (apenas agendamentos concluídos)
-    revenue = sum(a.total_price or 0 for a in appointments if a.status == "concluido")
+    revenue = sum(a.get('total_price', 0) or 0 for a in appointments if a.get('status') == "concluido")
     
     return {
         "period": f"{week_ago_str} até {today.strftime('%Y-%m-%d')}",

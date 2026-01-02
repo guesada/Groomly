@@ -2,7 +2,7 @@
 
 from flask import Blueprint, request, jsonify, session
 from werkzeug.security import generate_password_hash, check_password_hash
-from db import db, Cliente, Professional
+from database import db
 import re
 
 auth_bp = Blueprint('auth', __name__)
@@ -66,8 +66,8 @@ def register():
             }), 400
         
         # Verifica se email já existe
-        existing_client = Cliente.query.filter_by(email=email).first()
-        existing_professional = Professional.query.filter_by(email=email).first()
+        existing_client = db.get_client_by_email(email)
+        existing_professional = db.get_professional_by_email(email)
         
         if existing_client or existing_professional:
             return jsonify({
@@ -80,13 +80,14 @@ def register():
         
         if user_type == 'client':
             # Registra cliente
-            new_user = Cliente(
-                nome=name,
-                email=email,
-                senha=password_hash,
-                telefone=phone,
-                endereco=data.get('address', '')
-            )
+            user_data = {
+                'nome': name,
+                'email': email,
+                'senha': password_hash,
+                'telefone': phone,
+                'endereco': data.get('address', '')
+            }
+            new_user = db.create_client_user(user_data)
             
         elif user_type == 'professional':
             # Validações específicas para profissionais
@@ -117,31 +118,36 @@ def register():
             categoria = specialty_map.get(specialty, 'Profissional de Beleza')
             
             # Registra profissional
-            new_user = Professional(
-                nome=name,
-                email=email,
-                senha=password_hash,
-                telefone=phone,
-                endereco=address,
-                categoria=categoria,
-                especialidades='[]',  # Será configurado depois
-                preco_base=50.0,  # Preço padrão
-                disponibilidade='[]',  # Será configurado depois
-                bio=f'Profissional especializado em {categoria.lower()}.',
-                ativo=True
-            )
+            user_data = {
+                'nome': name,
+                'email': email,
+                'senha': password_hash,
+                'telefone': phone,
+                'endereco': address,
+                'categoria': categoria,
+                'especialidades': [],  # Será configurado depois
+                'preco_base': 50.0,  # Preço padrão
+                'disponibilidade': [],  # Será configurado depois
+                'bio': f'Profissional especializado em {categoria.lower()}.',
+                'ativo': True,
+                'avaliacao': 5.0,
+                'total_avaliacoes': 0
+            }
+            new_user = db.create_professional(user_data)
         else:
             return jsonify({
                 'success': False,
                 'message': 'Tipo de usuário inválido'
             }), 400
         
-        # Salva no banco
-        db.session.add(new_user)
-        db.session.commit()
+        if not new_user:
+            return jsonify({
+                'success': False,
+                'message': 'Erro ao criar usuário'
+            }), 500
         
         # Cria sessão
-        session['user_id'] = new_user.id
+        session['user_id'] = new_user['id']
         session['user_type'] = user_type
         session['user_name'] = name
         
@@ -149,7 +155,7 @@ def register():
             'success': True,
             'message': 'Usuário registrado com sucesso!',
             'user': {
-                'id': new_user.id,
+                'id': new_user['id'],
                 'name': name,
                 'email': email,
                 'type': user_type
@@ -157,7 +163,6 @@ def register():
         }), 201
         
     except Exception as e:
-        db.session.rollback()
         print(f"Erro no registro: {e}")
         return jsonify({
             'success': False,
@@ -183,26 +188,26 @@ def login():
         user = None
         user_type = None
         
-        client = Cliente.query.filter_by(email=email).first()
+        client = db.get_client_by_email(email)
         if client:
             user = client
             user_type = 'client'
         else:
-            professional = Professional.query.filter_by(email=email).first()
+            professional = db.get_professional_by_email(email)
             if professional:
                 user = professional
                 user_type = 'professional'
         
-        if not user or not check_password_hash(user.senha, password):
+        if not user or not check_password_hash(user['senha'], password):
             return jsonify({
                 'success': False,
                 'message': 'Email ou senha incorretos'
             }), 401
         
         # Cria sessão
-        session['user_id'] = user.id
+        session['user_id'] = user['id']
         session['user_type'] = user_type
-        session['user_name'] = user.nome
+        session['user_name'] = user['nome']
         
         print(f"DEBUG: Login successful. Session created: {dict(session)}")
         
@@ -210,9 +215,9 @@ def login():
             'success': True,
             'message': 'Login realizado com sucesso!',
             'user': {
-                'id': user.id,
-                'name': user.nome,
-                'email': user.email,
+                'id': user['id'],
+                'name': user['nome'],
+                'email': user['email'],
                 'type': user_type
             },
             'redirect': f'/{user_type}' if user_type == 'client' else '/barbeiro'
@@ -261,9 +266,9 @@ def get_current_user():
         
         # Busca usuário
         if user_type == 'client':
-            user = Cliente.query.get(user_id)
+            user = db.get_client_by_id(user_id)
         else:
-            user = Professional.query.get(user_id)
+            user = db.get_professional_by_id(user_id)
         
         if not user:
             session.clear()
@@ -275,12 +280,12 @@ def get_current_user():
         return jsonify({
             'success': True,
             'user': {
-                'id': user.id,
-                'name': user.nome,
-                'email': user.email,
+                'id': user['id'],
+                'name': user['nome'],
+                'email': user['email'],
                 'type': user_type,
-                'phone': user.telefone,
-                'address': getattr(user, 'endereco', '')
+                'phone': user.get('telefone'),
+                'address': user.get('endereco', '')
             }
         }), 200
         
